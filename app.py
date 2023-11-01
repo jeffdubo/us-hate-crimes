@@ -27,7 +27,7 @@ app = Flask(__name__)
 # Online Server Internal Connection (hosted website on Render):
 # db_url = 'postgresql://admin:fRFTp6MgD7AgfQYMYmyM5jaR8KAfKyXV@dpg-ck56k66ru70s738p5s4g-a/us_hate_crimes'
 # Online server Internal Connection (AWS)
-db_url = 'postgresql://postgres:6YVkKrTqWpYzrvd2rZ1E@us-hate-crimes.cijzjjb1xm6l.us-east-1.rds.amazonaws.com'
+db_url = 'postgresql://postgres:6YVkKrTqWpYzrvd2rZ1E@us-hate-crimes.cijzjjb1xm6l.us-east-1.rds.amazonaws.com/us_hate_crimes'
 engine = create_engine(db_url)
 
 # Reflect an existing database and tables
