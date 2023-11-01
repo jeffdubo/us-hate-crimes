@@ -9,7 +9,7 @@ pathlib
 
 # SQL
 SQLAlchemy==2.0.2
-psycopg2
+psycopg2-binary
 Flask
 # jsonify
 # warnings
