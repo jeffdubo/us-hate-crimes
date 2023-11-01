@@ -1,4 +1,4 @@
-# Render Requirements File
+# Requirements file for web/app hosting
 # Add all Python modules/libraries needed for website
 
 # Basic dependencies
@@ -16,5 +16,5 @@ Flask
 
 # Visualizations
 
-# Render
+# Other
 Gunicorn # Need to run apps
