@@ -36,10 +36,7 @@ Base.prepare(autoload_with=engine)
 
 session = Session(engine)
 
-print(Base.classes.keys())
 print('Connected to database and session initiated')
-
-
 
 # Define static routes
 
