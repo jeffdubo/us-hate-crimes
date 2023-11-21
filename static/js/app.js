@@ -5,7 +5,7 @@
 // Render hosting development URL
 // url = 'https://us-hate-crimes-dev.onrender.com'
 // AWS
-url = 'https://iepe54va65.us-west-2.awsapprunner.com'
+url = 'https://us-hate-crimes-ec33719b7996.herokuapp.com/'
 
 d3.json(url + '/bias')
   .then(function(data) {
