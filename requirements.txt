@@ -2,13 +2,15 @@
 # Add all Python modules/libraries needed for website
 
 # Basic dependencies
-pandas
-numpy
-requests
-pathlib
+# pandas
+# numpy
+# requests
+# pathlib
 
 # SQL
 SQLAlchemy==2.0.2
+# psycopg[c]; sys_platform == "linux"
+# psycopg[binary]; sys_platform != "linux"
 psycopg2-binary
 Flask
 # jsonify
@@ -17,4 +19,4 @@ Flask
 # Visualizations
 
 # Other
-Gunicorn # Need to run apps
+gunicorn # Need to run apps
