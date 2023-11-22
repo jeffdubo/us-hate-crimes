@@ -20,15 +20,9 @@ app = Flask(__name__)
 
 
 # Create a SQLAlchemy database engine
-# Jeff's Login:
-# db_url = 'postgresql://postgres:bootcamp2023@localhost:5432/us_hate_crimes'
-# Online Server External Connection (pgAdmin on local computer):
-# db_url = 'postgresql://admin:fRFTp6MgD7AgfQYMYmyM5jaR8KAfKyXV@dpg-ck56k66ru70s738p5s4g-a.oregon-postgres.render.com:5432/us_hate_crimes'
-# Online Server Internal Connection (hosted website on Render):
-# db_url = 'postgresql://admin:fRFTp6MgD7AgfQYMYmyM5jaR8KAfKyXV@dpg-ck56k66ru70s738p5s4g-a/us_hate_crimes'
-# Online server Internal Connection (AWS)
-db_url = 'postgresql://xpdswhjtkuwpaq:5a0ca5aee8b4b924ec44eeabe4ad10002db16031b9ba5049a013e8602d9bdce7@ec2-3-232-218-211.compute-1.amazonaws.com:5432/df6ou9vpekj0v9'
-engine = create_engine(db_url)
+
+# db_url = 'postgresql://xpdswhjtkuwpaq:5a0ca5aee8b4b924ec44eeabe4ad10002db16031b9ba5049a013e8602d9bdce7@ec2-3-232-218-211.compute-1.amazonaws.com:5432/df6ou9vpekj0v9'
+engine = create_engine(DATABASE_URL)
 
 # Reflect an existing database and tables
 Base = automap_base()
