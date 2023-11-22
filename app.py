@@ -5,6 +5,8 @@ from flask import Flask, jsonify, render_template
 from sqlalchemy import create_engine, text, func, extract
 from sqlalchemy.ext.automap import automap_base
 from sqlalchemy.orm import Session
+import os
+
 
 app = Flask(__name__)
 
@@ -22,7 +24,8 @@ app = Flask(__name__)
 # Create a SQLAlchemy database engine
 
 # db_url = 'postgresql://xpdswhjtkuwpaq:5a0ca5aee8b4b924ec44eeabe4ad10002db16031b9ba5049a013e8602d9bdce7@ec2-3-232-218-211.compute-1.amazonaws.com:5432/df6ou9vpekj0v9'
-engine = create_engine(DATABASE_URL)
+db_url = os.getenv("DATABASE_URL")
+engine = create_engine(db_url)
 
 # Reflect an existing database and tables
 Base = automap_base()
