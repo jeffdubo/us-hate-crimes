@@ -1,11 +1,6 @@
 // Local URL
-// url = 'http://127.0.0.1:5000'
-// Render hosting production URL
-// url = 'https://us-hate-crimes.onrender.com'
-// Render hosting development URL
-// url = 'https://us-hate-crimes-dev.onrender.com'
-// AWS
-url = 'https://us-hate-crimes-ec33719b7996.herokuapp.com/'
+// Note: If hosted, replace this with website URL
+url = 'http://127.0.0.1:5000'
 
 d3.json(url + '/bias')
   .then(function(data) {
@@ -82,6 +77,9 @@ function createLineChart(selectedState, stateData) {
     title: "Hate Crimes by Bias Category Over Time",
     xaxis: { title: "Year" },
     yaxis: { title: "Incident Count" },
+    // height: 600,
+    // width: 1000,
+    margin: {b: 20}
   };
 
   // Create the line chart using Plotly
@@ -196,6 +194,8 @@ function createTop10Chart1(info) {
     title: 'Most Hate Crimes by State',
     yaxis: { title: "State", automargin: true },
     xaxis: { title: "Incident Count" },
+    // height: 425,
+    // width: 500
   };
     
   // Plot chart
@@ -231,6 +231,8 @@ function createTop10Chart2(info) {
     title: 'Incident Rates by State',
     yaxis: { title: "State", automargin: true },
     xaxis: { title: "Incident Rate (per 10M people)" },
+    // height: 425,
+    // width: 500
   };
     
   // Plot chart

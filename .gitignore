@@ -1,6 +1,6 @@
-# Other files not needed in Github
+# Project exclusions
+config.py
 my-resources/
-etl/api_keys
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
