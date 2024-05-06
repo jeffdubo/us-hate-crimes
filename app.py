@@ -3,227 +3,362 @@
 
 # Load dependencies
 from flask import Flask, jsonify, render_template
-from sqlalchemy import create_engine, text, func, extract
+from sqlalchemy import create_engine, MetaData, inspect, Table, Column, Integer, String, func, distinct, and_
 from sqlalchemy.ext.automap import automap_base
 from sqlalchemy.orm import Session
-
-app = Flask(__name__)
+from sqlalchemy.sql.expression import cast
+import time
 
 # Get database information from config file
 # Note: config.py must be created locally and is not stored in Github
-from config import db_username, db_password, db_host, db_port, db_name
+from config import postgreSQL_flag, db_username, db_password, db_host, db_port, db_name
+
+app = Flask(__name__)
 
 # Create a SQLAlchemy database engine
-db_url = f'postgresql://{db_username}:{db_password}@{db_host}:{db_port}/{db_name}'
+
+if postgreSQL_flag:
+    db_url = f'postgresql://{db_username}:{db_password}@{db_host}:{db_port}/{db_name}'
+else:
+    db_url = 'sqlite:///database/us_hate_crimes_sqlite.db'
+
 engine = create_engine(db_url)
 
-# Reflect an existing database and tables
-Base = automap_base()
+# Create MetaData object and reflect existing database
+metadata = MetaData()
+metadata.reflect(engine)
+
+# Create table objects to set primary key for tables in sqlite database
+# Sqlite tables were created with Pandas to_sql which does not support setting primary keys
+Table(
+    'state',
+    metadata,
+    Column('state_abbr', String, primary_key=True, nullable=False),
+    autoload_with=engine,
+    extend_existing=True
+)
+
+Table(
+    'bias',
+    metadata,
+    Column('bias_id', Integer, primary_key=True, nullable=False),
+    autoload_with=engine,
+    extend_existing=True
+)
+
+# Set table objects to set primary key for views
+Table(
+    'year_view',
+    metadata,
+    Column('id', Integer, primary_key=True, nullable=False),
+    autoload_with=engine
+)
+
+Table(
+    'incident_view',
+    metadata,
+    Column('id', Integer, primary_key=True, nullable=False),
+    autoload_with=engine
+)
+
+Table(
+    'population_view',
+    metadata,
+    Column('id', Integer, primary_key=True, nullable=False),
+    autoload_with=engine
+)
+
+# Create mappings
+Base = automap_base(metadata=metadata)
 Base.prepare(autoload_with=engine)
 
-session = Session(engine)
+# Define variables for related tables
+B = Base.classes.bias
+S = Base.classes.state
+Y = Base.classes.year_view
+I = Base.classes.incident_view
+P = Base.classes.population_view
 
-print('Connected to database and session initiated')
+print('Connected to database')
 
 # Define static routes
 
-# Launches site
+# Launch site
 @app.route('/') 
 def index():
     return render_template('index.html')
 
-
-# gets data based on bias
-@app.route('/bias')
-def get_data_bias():
-
+# Get lists for select dropdowns to filter charts
+@app.route('/lists')
+def get_lists():
     try:
-        # Variables for related tables
-        bias = Base.classes.bias
-        bias_categories = Base.classes.bias_categories
-        main_inc = Base.classes.main_incidents
+        session = Session(engine)
         
-        # query statement
-        sel = [main_inc.data_year, main_inc.state_name, main_inc.bias_desc,
-               main_inc.incident_id, bias_categories.category]
+        # Year list
+        year_results = session.query(Y.year).order_by(Y.year.desc()).all()
+        year_list = [row.year for row in year_results]
+        
+        # State list
+        state_results = session.query(S.state).order_by(S.state.asc()).all()
+        state_list = [row.state for row in state_results]
 
-        # join statement
-        query = session.query(*sel)\
-                .filter(bias.bias == main_inc.bias_desc)\
-                .filter(bias.category_id == bias_categories.category_id)
-
-        # Query statement
-        result = query.all()
-
-        # Create a list of dictionaries
-        keys = ["year","state","bias","id","category"]
-        bias_dict = []
-        bias_dict = [dict(zip(keys, item)) for item in result]
-        # Assign the metadata list to the "metadata" key in the data dictionary
-        dataToReturn = {"bias_data": bias_dict}
-                
+        # Bias categories list
+        bias_results = session.query(B.bias_category
+            ).group_by(B.bias_category
+            ).order_by(B.bias_category.asc()
+            ).all()
+        bias_list = [row.bias_category for row in bias_results]
+      
+        session.close()
+        
+        dataToReturn = {'states': state_list, 'years': year_list, 'bias': bias_list}
+        
         return jsonify(dataToReturn)   
-       
-
-    except Exception as e:
-        # Handle and log any exceptions
-        print("Error accessing the table:", str(e))
-        return jsonify({"error": "Table access failed"}), 500
-
-# Route to access data for time vs bias per state chart
-@app.route('/matt')
-def get_data_matt():
-    try:
-        # Variables for related tables
-        bias = Base.classes.bias
-        bias_categories = Base.classes.bias_categories
-        main_inc = Base.classes.main_incidents
-
-        # Query statement
-        result = session.query(
-            main_inc.data_year,
-            main_inc.state_name,
-            bias_categories.category,  # Use category instead of bias_desc
-            func.count(main_inc.incident_id).label("count")
-        ).join(bias, bias.bias == main_inc.bias_desc)\
-         .join(bias_categories, bias_categories.category_id == bias.category_id)\
-         .group_by(main_inc.data_year, main_inc.state_name, bias_categories.category)\
-         .order_by(main_inc.data_year.asc()).all()
-
-        # Create a list of dictionaries
-        keys = ["year", "state", "category", "count"]  # Update keys to include "category"
-        category_dict = [dict(zip(keys, item)) for item in result]
-
-        # Assign the metadata list to the "metadata" key in the data dictionary
-        dataToReturn = {"state_data": category_dict}
-
-        return jsonify(dataToReturn)
-
-    except Exception as e:
-        # Handle and log any exceptions
-        print("Error accessing the table:", str(e))
-        return jsonify({"error": "Table access failed"}), 500
-
-
-@app.route('/time')
-def get_data_time():
-    try:
-        
-        main_incidents = Base.classes.main_incidents
-        
-        result = session.query(
-            main_incidents.data_year,
-            func.count(main_incidents.incident_id).label("count")  # Change label to "count"
-        ).group_by(
-            main_incidents.data_year
-        ).order_by(main_incidents.data_year.asc()).all()               
-                
-        # Convert the query result to a list of dictionaries
-        data_list = [{"data_year": row.data_year, "count": row.count} for row in result]
-
-        dataToReturn = {"time_data": data_list}
-
-        # Print a success message
-        print("Table access successful")
-        
-        # return jsonify(data_list)
-        return jsonify(dataToReturn)        
-        
-    except Exception as e:
-        print("Error accessing the table:", str(e))
-        return jsonify({"error": "Table access failed"}), 500
     
-@app.route('/top10Data')
-def get_top10_data():
-
-    try:
-        # Create dictionary to hold all data
-        dataToReturn = {}
-
-        # Store tables in variables
-        C = Base.classes.census_data
-        S = Base.classes.states
-        I = Base.classes.incidents
-
-        # Create list of all states and add to data dictionary
-        states = []
-        # Don't include Federal Government and Guam in list of states
-        query = session.query(S).filter(S.state_abbr != 'FS').filter(S.state_abbr != 'GM')
-        for row in query.all():
-            states.append(row.state)
-        dataToReturn['states'] = states
-
-        # Query to get population and incident counts by state and year
-        sel = [C.year, S.state, C.population, I.incident_id]
-        query = session.query(C.year, S.state, func.min(C.population).label('population'), func.count(I.incident_id).label('incidents'))
-        query = query.filter(C.state_abbr == S.state_abbr).filter(C.race_id == -1)
-        query = query.filter(I.state_abbr == S.state_abbr).filter(extract('year', I.incident_date) == C.year)
-        query = query.group_by(C.year, S.state)
-        query = query.order_by(func.count(I.incident_id).desc())
-
-        # Create lists for data and years
-        data = []
-        years = []
-        
-        # Set years in list
-        [years.append(year) for year in range(2009, 2022)]
-
-        # Loop through each year to create data lists
-        for year in years:
-            states = []
-            population = []
-            incidents = []
-            incident_rate = []
-            
-            # Loop through every row for the year
-            for row in query.filter(C.year == year).all():
-                # Append data to list for the year
-                states.append(row.state)
-                population.append(row.population)
-                incidents.append(row.incidents)
-                incident_rate.append(round(row.incidents / row.population * 10000000, 2))
-            
-            # Store lists in a dictionary and append to data list
-            current_year = {'year': year, 'states': states, 'population': population,
-                            'incidents': incidents, 'incident_rate': incident_rate}
-            data.append(current_year)
-        
-        dataToReturn['years'] = years
-        dataToReturn['data'] = data
-        return jsonify(dataToReturn)
-
     except Exception as e:
-        # Handle and log any exceptions
         print("Error accessing the table:", str(e))
-        return jsonify({"error": "Table access failed"}), 500   
+        return jsonify({"error": "Table access failed"}), 500
 
-@app.route('/state_offense')
-def get_data_state_offense():
-    try:
-        main_incidents = Base.classes.main_incidents
-        results = session.query(
-            main_incidents.state_name,
-            main_incidents.offense_name,
-            main_incidents.data_year,
-            func.count(main_incidents.incident_id).label("count")
-        ).group_by(
-            main_incidents.state_name,
-            main_incidents.offense_name,
-            main_incidents.data_year
+# Get data for all charts
+@app.route('/biasdata/<year>/<state>/<bias_category>')
+def get_data(year, state, bias_category):
+    
+    # Call functions to get data for each chart
+    inc_list = get_inc_data(year, state, bias_category)
+    bias_list = get_bias_data(year, state, bias_category)
+
+    # Create dictionary for return
+    dataToReturn = {'incident': inc_list, 'bias': bias_list}   
+
+    return jsonify(dataToReturn)
+
+@app.route('/offensedata/<year>/<state>/<bias_category>')
+def get_offense_data(year, state, bias_category):
+    
+    # Call function to get data for each chart
+    offense_list = get_offense_data(year, state, bias_category)
+
+    # Create dictionary for return
+    dataToReturn = {'offense': offense_list}   
+
+    return jsonify(dataToReturn)
+
+
+# Get data for all charts
+@app.route('/ratedata/<year>/<state>/<bias_category>')
+def get_rate_data(year, state, bias_category):
+    
+    # Call functions to get data for each chart
+    rate_list = get_rate_data(year, state, bias_category)
+
+    # Create dictionary for return
+    dataToReturn = {'rate': rate_list}   
+
+    return jsonify(dataToReturn)
+
+# Define route functions
+
+# Get query results for chart functions
+def get_query_results(table, columns, filters, groups_orders):
+    
+    session = Session(engine)
+    results = session.query(table).with_entities(*columns
+        ).filter(*filters
+        ).group_by(*groups_orders
+        ).order_by(*groups_orders
         ).all()
-        data_list = [{"state_name": row.state_name, "offense_name": row.offense_name, "data_year": row.data_year, "count": row.count} for row in results]
-        dataToReturn = {"state_offense_data": data_list}
-        print("Table access successful")
-        return jsonify(dataToReturn)
+    session.close()
+
+    return results
+
+# Get data for incident chart and convert to a list of dictionaries
+def get_inc_data(year, state, bias_category):
+
+    start_time = time.time()
     
-    except Exception as e:
-        print("Error accessing the table:", str(e))
-        return jsonify({"error": "Table access failed"}), 500
+    # Initiatize query variables
+    columns = []
+    filters = []
+    
+    # Year - no filtering
+    columns.append(I.incident_year)
+    
+    # State
+    if state == 'All':
+        columns.append(I._all)
+    else:
+        columns.append(I.state)
+        filters.append(I.state == state)        
+    
+    # Bias category - no filtering
+    columns.append(I._all)
 
+    # Finalize query variables and run query
+    groups_orders = columns.copy()
+    columns.append(func.count(distinct(I.incident_id)).label('incidents'))
+    results = get_query_results(I, columns, filters, groups_orders)
+    
+    # Create list of dictionaries
+    keys = ['year', 'state', 'bias_category', 'incidents', 'population']
+    data_list = [dict(zip(keys, row)) for row in results]
 
-# THIS GOES AT THE END OF THE FILE ONLY 
-session.close()   
+    print('Incident data: completed in %s seconds' % (time.time() - start_time))
+
+    return data_list
+
+# Get data for offense chart and convert to a list of dictionaries
+def get_offense_data(year, state, bias_category):
+
+    start_time = time.time()
+
+    # Initiatize query variables
+    columns = []
+    filters = []
+    
+    # Year
+    if year == 'All':
+        columns.append(I._all)
+    else:
+        columns.append(I.incident_year)
+        filters.append(I.incident_year == year)
+
+    # State
+    if state == 'All':
+        columns.append(I._all)
+    else:
+        columns.append(I.state)
+        filters.append(I.state == state)
+
+    # Bias category
+    if bias_category == 'All':
+        columns.append(I._all)
+    else:
+        columns.append(I.bias_category)
+        filters.append(I.bias_category == bias_category)
+
+    # Finalize query variables and run query
+    columns.append(I.offense)
+    groups_orders = columns.copy()
+    columns.append(func.count(distinct(I.incident_id)).label('incidents'))
+    results = get_query_results(I, columns, filters, groups_orders)
+
+    # Create list of dictionaries
+    keys = ['year', 'state', 'bias_category', 'offense', 'incidents']
+    data_list = [dict(zip(keys, row)) for row in results]
+
+    print('Offense data: completed in %s seconds' % (time.time() - start_time))
+
+    return data_list
+
+# Get data for bias chart and convert to a list of dictionaries
+def get_bias_data(year, state, bias_category):
+    
+    start_time = time.time()
+
+    # Initiatize query variables
+    columns = []
+    filters = []
+    
+    # Year - no filtering
+    columns.append(I.incident_year)
+   
+    # State
+    if state == 'All':
+        columns.append(I._all)
+    else:
+        columns.append(I.state)
+        filters.append(I.state == state)
+    
+    # Bias category - no filtering
+    columns.append(I.bias_category)
+
+    # Finalize query variables and run query
+    groups_orders = columns.copy()
+    columns.append(func.count(distinct(I.incident_id)).label('incidents'))
+    results = get_query_results(I, columns, filters, groups_orders)
+
+    # Create list of dictionaries
+    keys = ['year', 'state', 'bias_category', 'incidents']
+    data_list = [dict(zip(keys, row)) for row in results]
+
+    print('Bias data: completed in %s seconds' % (time.time() - start_time))
+
+    return data_list
+
+# Get list of dictionaries for incident rate chart
+def get_rate_data(year, state, bias_category):
+
+    start_time = time.time()
+    
+    session = Session(engine)
+    
+    # Initiatize query variables
+    columns = []
+    columnsSub = []
+    filters = []
+    filtersSub = []
+    joins = []
+    
+    # Year
+    if year == 'All':
+        columns.append(P._all)
+        columnsSub.append(I.incident_year)
+    else:
+        columns.append(P.year)
+        columnsSub.append(I.incident_year)
+        filters.append(P.year == year)
+        filtersSub.append(I.incident_year == year)
+    
+    # State - no filtering
+    columns.append(P.state)
+    columnsSub.append(I.state)  
+    
+    # Bias category
+    if bias_category == 'All':
+        columnsSub.append(I._all)
+    else:
+        columnsSub.append(I.bias_category)
+        filtersSub.append(I.bias_category == bias_category)
+
+    # Finalize query variables and run subquery
+    groupsOrdersSub = columnsSub.copy()
+    columnsSub.append(cast(func.count(distinct(I.incident_id)), Integer).label('incidents'))
+    
+    # Get incident count per state per year for main query
+    subquery = session.query(I).with_entities(*columnsSub
+        ).filter(*filtersSub
+        ).group_by(*groupsOrdersSub).subquery()
+    
+    # Finalize query variables and run  mainquery
+    if bias_category == 'All':
+        columns.append(subquery.c._all)
+    else:
+        columns.append(subquery.c.bias_category)
+    groupsOrders = columns.copy()
+    columns.append(cast(func.round(func.avg(subquery.c.incidents), 0), Integer).label('incidents'))
+    columns.append(cast(func.round(func.avg(P.population), 0), Integer).label('population'))
+    if year != 'All':
+        joins = [and_(subquery.c.incident_year == P.year, subquery.c.state == P.state)]
+    else:
+        joins = [and_(subquery.c.state == P.state)]
+    
+    # Get average incident count and population if year = 'All'
+    results = session.query(P).with_entities(*columns
+        ).join(subquery, *joins
+        ).filter(*filters
+        ).group_by(*groupsOrders
+        ).order_by(*groupsOrders
+        ).all()
+
+    session.close()
+
+    # Create list of dictionaries
+    keys = ['year', 'state', 'bias_category', 'incidents', 'population']
+    data_list = [dict(zip(keys, row)) for row in results]
+
+    print('Incident rate data: completed in %s seconds' % (time.time() - start_time))
+
+    return data_list
+     
 if __name__ == '__main__':
     app.run(debug=True)
-
-
