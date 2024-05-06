@@ -1,305 +1,378 @@
 // Local URL
 // Note: If hosted, replace this with website URL
-url = 'http://127.0.0.1:5000'
+var url = 'http://127.0.0.1:5000'
 
-d3.json(url + '/bias')
-  .then(function(data) {
-    console.log(data);     
-  })
-  .catch(function (error) {
-    console.error("Error loading JSON data:", error);
-  });
+// Set variables for html elements for dropdown filters 
+var selectYear = d3.select("#selYear");  
+var selectState = d3.select("#selState");
+var selectBias = d3.select("#selBias");
 
-d3.json(url + '/matt')
-  .then(function (data) {
-    console.log(data);
+// Set variables for html elements for information panel
+var infoState = d3.select("#infoState");
+var infoInc = d3.select("#infoInc");
+var infoPop = d3.select("#infoPop");
+var infoRate = d3.select("#infoRate");
 
-    // Create a set to store unique state names
-    const uniqueStateNames = new Set();
+// Set variable for colors for bias line chart
+var biasColor = { 
+	'Race, Ethnicity or Ancestry': '#FFBF00',
+	'Religion': '#ed6028',
+	'Disability': '#a5e84d',
+	'Gender': '#f71e1e',
+	'Gender Identity': '#4b50cc',
+	'Sexual Orientation': '#aa2fcc',
+	'All': '#e0e0e0'
+};
 
-    // Populate the select options with state names
-    const selectElement = d3.select("#selDataset");
-
-    // Iterate through the state data
-    data.state_data.forEach(state_dataEntry => {
-      const stateName = state_dataEntry.state;
-
-      // Check if the state name is not already in the set
-      if (!uniqueStateNames.has(stateName)) {
-        selectElement.append("option").attr("value", stateName).text(stateName);
-        // Add the state name to the set to mark it as encountered
-        uniqueStateNames.add(stateName);
-      }
-    });
-
-    // Set up an event listener for the select element change event
-    selectElement.on("change", function () {
-      let selectedState = this.value; // Get the selected state from the dropdown
-      createLineChart(selectedState, data.state_data);
-    });
-
-    // Get the initial state (e.g., "Alabama") for the line chart
-    let selectedState = "Alabama";
-    createLineChart(selectedState, data.state_data);
-  });
-
-// Function to create the line chart
-function createLineChart(selectedState, stateData) {
-  // Filter the state data for the selected state
-  const filteredData = stateData.filter(entry => entry.state === selectedState);
-
-  // Group data by bias category
-  const groupedData = {};
-
-  filteredData.forEach(entry => {
-    if (!groupedData[entry.category]) {
-      groupedData[entry.category] = {
-        x: [],
-        y: [],
-        mode: 'lines+markers',
-        name: entry.category,
-      };
-    }
-    groupedData[entry.category].x.push(entry.year);
-    groupedData[entry.category].y.push(entry.count);
-  });
-
-  // Sort data within each bias group by year
-  Object.values(groupedData).forEach(group => {
-    const sortedIndices = group.x.map((_, i) => i).sort((a, b) => group.x[a] - group.x[b]);
-    group.x = sortedIndices.map(i => group.x[i]);
-    group.y = sortedIndices.map(i => group.y[i]);
-  });
-
-  const chartData = Object.values(groupedData);
-
-  const layout = {
-    title: "Hate Crimes by Bias Category Over Time",
-    xaxis: { title: "Year" },
-    yaxis: { title: "Incident Count" },
-    // height: 600,
-    // width: 1000,
-    margin: {b: 20}
-  };
-
-  // Create the line chart using Plotly
-  Plotly.newPlot("chart1", chartData, layout);
+// Create dropdown options for an HTML element
+function createSelectOptions(select, values) {
+	select.append("option").attr("value", "All").text("All");
+	values.forEach(value => {
+		select.append("option").attr("value", value).text(value);
+  	});
 }
 
-d3.json(url + '/time')
-  .then(function(data) {
-    console.log(data);
-    time_data = data;
-    timelineChart(time_data);
-  })
-  .catch(function (error) {
-    console.error("Error loading JSON data:", error);
-  });
+// Get lists for dropdown filters from database
+d3.json(url + '/lists')
+	.then(function (data) {
+    	console.log('Lists', data);
+    	
+		// Populate the select options for state and year dropdowns
+		createSelectOptions(selectYear, data.years);
+		createSelectOptions(selectState, data.states);
+		createSelectOptions(selectBias, data.bias);
+		
+		// Set selected year to most recent year
+		selectYear.node().value = data.years[0];
+	})
+	.catch(function (error) {
+		console.error("Error loading JSON data:", error);
+	});
 
-  function timelineChart(timeData) {
-    // Extract data for the chart
-    const data = timeData.time_data;
-    const years = data.map(item => item.data_year);
-    const counts = data.map(item => item.count);
+// Refresh charts, map and information panel with new data
+function refreshData() {
+
+	// Initialize variables for app calls
+	var selectedYear = selectYear.node().value;
+	var selectedState = selectState.node().value;
+	var selectedBias = selectBias.node().value;
+	if (selectedYear === '') { selectedYear = 2020; };
+	if (selectedState === '') { selectedState = 'All'; };
+	if (selectedBias === '') { selectedBias = 'All'; };
+
+	// Get bias data and create/refresh charts
+	d3.json(url + '/biasdata/' + selectedYear + '/' + selectedState + '/' + selectedBias)
+		.then(function (data) {
+			
+			// Create and update charts
+			createBiasChart(data.bias, data.incident);
+			createBiasPieChart(data.bias, selectedYear);
+		})
+		.catch(function (error) {
+    		console.error("Error loading JSON data:", error);
+		});	
+
+	// Get offense data and create/update chart
+	d3.json(url + '/offensedata/' + selectedYear + '/' + selectedState + '/' + selectedBias)
+		.then(function (data) {
+			
+			createOffenseChart(data.offense);
+		})
+		.catch(function (error) {
+    		console.error("Error loading JSON data:", error);
+		});	
+
+	// Get race data and create/update charts, panel information and map
+	d3.json(url + '/ratedata/' + selectedYear + '/' + selectedState + '/' + selectedBias)
+		.then(function (data) {
+  			
+			// Update panel information
+			const infoDict = getStateInfo(data.rate);
+			updatePanelandMap(infoDict, selectedState, selectedYear);
+
+			// Create and update chart
+			createIncRateChart(infoDict);
+		})
+		.catch(function (error) {
+    		console.error("Error loading JSON data:", error);
+		});
+
+}
+
+// Create charts and panel information when site launches
+refreshData();
+
+// Get panel information and data for incident rate chart
+function getStateInfo(data, selectedState, selectedYear) {
+
+	// Create dictionary with data
+	const infoDict = {};
+	
+	// Initialize key to total incidents and population for all states
+	infoDict['All'] = {'incidents': 0, 'incident_rate': 0, 'population': 0 };
     
-    // Create a trace for the line chart
-    const trace = {
-      x: years,
-      y: counts,
-      type: 'line',
-      mode: 'lines+markers', // Show markers on data points
-      marker: {
-        color: 'blue' // Customize line color
-      }
-    };
-  
-    // Specify the layout options for the chart
+	data.forEach(entry => {
+        if (!infoDict[entry.state]) {
+			infoDict[entry.state] = {'incidents': 0, 'incident_rate': 0, 'population': 0 }
+        };
+        infoDict[entry.state].incidents = entry.incidents;
+		infoDict[entry.state].incident_rate = Math.round(entry.incidents/entry.population*10000000, 1);
+        infoDict[entry.state].population = Math.round(entry.population/100000)/10;
+		infoDict['All'].incidents += entry.incidents;
+		infoDict['All'].population += entry.population;	
+    });
+	// Calculate incide_rate for all states combined (used for panel for US)
+	infoDict['All'].incident_rate = Math.round(infoDict['All'].incidents/infoDict['All'].population*10000000, 1);
+	infoDict['All'].population = Math.round(infoDict['All'].population/100000)/10;
+
+	// Return dictionary to update map and create incident rate chart
+	return infoDict
+}
+
+// Update information panel and map when data is refreshed
+function updatePanelandMap(infoDict, selectedState, selectedYear) {
+	
+	// Update heading for information panel
+	if (selectedState == 'All') {
+		infoState.text("United States");
+	} else {
+		infoState.text(selectedState);
+	};
+	
+	// Display message when years is set to all (indicates that values are averages over all years)
+	const message = d3.select("#info-message");
+	if (selectedYear == "All") {
+		message.classed("d-block", true);
+		message.classed("d-none", false);
+	} else {
+		message.classed("d-block", false);
+		message.classed("d-none", true);
+	};
+	
+	// Update panel data
+	infoInc.text(infoDict[selectedState].incidents);
+	infoPop.text(infoDict[selectedState].population + "M");
+	infoRate.text(infoDict[selectedState].incident_rate);
+
+	// Update state data on map
+	Object.keys(infoDict).forEach(state => {
+		if (state != 'All') {
+			const layer = stateLayer.getLayer(state);
+			layer.feature.properties.incidents = infoDict[state].incidents;
+			layer.feature.properties.incident_rate = infoDict[state].incident_rate;
+			layer.feature.properties.population = infoDict[state].population;
+			stateLayer.resetStyle(layer);
+		};
+	});
+
+	// Update map appearance based on selected state
+	updateMap(selectedState);
+}
+
+function createBiasChart(biasData, incidentData) {
+	
+	// Store incident years and totals
+	const years = incidentData.map(item => item.year);
+	const incidents = incidentData.map(item => item.incidents);
+
+	// Create a dictionary with a trace for each bias
+	const traceDict = {};
+	const allDict = {}
+	
+	// Create traces for each bias category
+	biasData.forEach(entry => {
+    	if (!traceDict[entry.bias_category]) {
+	    	traceDict[entry.bias_category] = {
+        		x: [],
+          		y: [],
+				mode: 'lines',
+				line: { color: biasColor[entry.bias_category], width: 3 },
+          		name: entry.bias_category,
+        	};
+    	};	
+    	traceDict[entry.bias_category].x.push(entry.year);
+    	traceDict[entry.bias_category].y.push(entry.incidents);
+	});
+
+	// Create trace for all categories combined
+	traceDict['All'] = {
+		x: years,
+		y: incidents,
+		mode: 'lines',
+		line: { color: biasColor['All'], width: 2 },
+		name: 'All Categories'
+	};
+
+	// Extract traces and store in a data array
+    const chartData = Object.values(traceDict);
+
+	// Specify the layout options for the chart
     const layout = {
-      title: "Total Hate Crimes Over Time",
-      xaxis: { title: "Year" },
-      yaxis: { title: "Incident Count" },
+		xaxis: { showgrid: false },
+      	yaxis: { title: 'Incidents', griddash: 'dot', gridcolor: 'rgba(255,255,255,.1)'},
+		font: { color: 'white'},
+		showlegend: false,
+		paper_bgcolor: 'rgba(0,0,0,0)',
+		plot_bgcolor: 'rgba(0,0,0,0)',
+		height: 375,
+		margin: {t: 25, r: 25, b: 35, l: 70}
     };
-  
-    // Create a data array with the trace
-    const plotData = [trace];
-  
-    // Render the line chart in the specified container
-    Plotly.newPlot('chart2', plotData, layout);
-  }
-  
-d3.json(url + '/top10Data')
-  .then(function (data) { 
-    console.log('Top 10 Data', data);
-    
-    // Store JSON data in separate variables
-    let states = data.states;
-    let years = data.years;
-    let chart_data = data.data;
-    
-    // Log first row of data in variables for review
-    console.log('States:', states);
-    console.log('Years:', years);
-    console.log('First year (2009):', chart_data[0]);
-    
-    const selectYear = d3.select('#selYear');
-    let initial_year = 2021;
 
-    createYearDropDown(years);
-    createTop10Chart1(chart_data[initial_year - 2009]);
-    createTop10Chart2(chart_data[initial_year - 2009]);
-    
-    // Set up an event listener for the select element change event
-    selectYear.on("change", function() {
-      let year = this.value; // Get the selected year from the dropdown
-      console.log(year);
-      createTop10Chart1(chart_data[year - 2009]);
-      createTop10Chart2(chart_data[year - 2009]);
-    });
+	// Ensure chart adjust size to accomodate Bootstap's responsive layout
+	const config = {responsive: true}
 
-  });
-
-function createYearDropDown(years) {
-    
-  // Loop through all names/IDs and add drop down menu option for each test subject
-  for(let i=0; i<years.length; i++) {
-    year = years[i]; 
-    // Add option elementference for updating charts/info 
-    d3.select('#selYear').append('option').text(year).attr('value', year);
-  };
-}
-    
-function createTop10Chart1(info) {
-
-  let states = info.states;
-  let incidents = info.incidents;
-  let incident_rate = info.incident_rate;
-  
-  states = states.slice(0, 10).reverse();
-  incidents = incidents.slice(0, 10).reverse();
-  incident_rate = incident_rate.slice(0, 10).reverse();
-
-  // Create data variable for plotting charts
-  let data = [{
-    x: incidents,
-    y: states,
-    text: incident_rate,
-    type: 'bar',
-    orientation: 'h'
-  }];
-    
-  // Log data for review
-  console.log('Initial Bar Chart Data:', data);
-       
-  let layout = {
-    title: 'Most Hate Crimes by State',
-    yaxis: { title: "State", automargin: true },
-    xaxis: { title: "Incident Count" },
-    // height: 425,
-    // width: 500
-  };
-    
-  // Plot chart
-  Plotly.newPlot('top10bar1', data, layout);
-    
+    // Render the chart in the specified container
+    Plotly.newPlot("biasChart", chartData, layout, config);
 }
 
-function createTop10Chart2(info) {
+function createBiasPieChart(data, selectedYear) {
+	
+	// Create a dictionary with a trace for each bias
+	const traceDict = {};
+	data.forEach(entry => {
+    	if (!traceDict[entry.bias_category]) {
+	    	traceDict[entry.bias_category] = 0;
+		};	
+    	if (selectedYear == 'All' | selectedYear == entry.year) {
+			traceDict[entry.bias_category] += entry.incidents;
+		}
+	});
+	
+	const biasCategories = Object.keys(traceDict);
+	const incidents = Object.values(traceDict);
+	const biasColors = biasCategories.map(category => biasColor[category])
 
-  let states = info.states;
-  let incidents = info.incidents;
-  let incident_rate = info.incident_rate;
-  let population = info.population;
-  
-  states = states.slice(0, 10).reverse();
-  incidents = incidents.slice(0, 10).reverse();
-  incident_rate = incident_rate.slice(0, 10).reverse();
-  population = population.slice(0, 10).reverse();
+	// Create trace for chart and store in a data array
+	const chartData = [{
+			values: incidents,
+			marker: {
+				colors: biasColors,
+			},
+			labels: biasCategories,
+			type: 'pie',
+			hole: .5
+		}];
 
-  // Create data variable for plotting charts
-  let data = [{
-    x: incident_rate,
-    y: states,
-    text: population,
-    type: 'bar',
-    orientation: 'h'
-  }];
-    
-  // Log data for review
-  console.log('Initial Bar Chart Data:', data);
-       
-  let layout = {
-    title: 'Incident Rates by State',
-    yaxis: { title: "State", automargin: true },
-    xaxis: { title: "Incident Rate (per 10M people)" },
-    // height: 425,
-    // width: 500
-  };
-    
-  // Plot chart
-  Plotly.newPlot('top10bar2', data, layout);
-    
+	// Specify the layout options for the chart
+    const layout = {
+     	font: { color: 'white'},
+		showlegend: true,
+		legend: { 'orientation': 'h'}, // , 'yanchor': 'auto'
+		paper_bgcolor: 'rgba(0,0,0,0)',
+		plot_bgcolor: 'rgba(0,0,0,.5)',
+		height: 375,
+		margin: {t: 25, r: 25, b: 100, l: 40}
+    };
+
+	// Ensure chart adjust size to accomodate Bootstap's responsive layout
+	const config = {responsive: true}
+
+    // Render the chart in the specified container
+    Plotly.newPlot("biasPieChart", chartData, layout, config);
 }
 
-d3.json(url + '/state_offense')
-    .then(function(data) {
-        const uniqueStates = new Set();
-        const uniqueYears = new Set();
-        data.state_offense_data.forEach(entry => {
-            uniqueStates.add(entry.state_name);
-            uniqueYears.add(entry.data_year);
-        });
-        const stateFilter = d3.select("#stateFilter");
-        uniqueStates.forEach(state => {
-            stateFilter.append("option").attr("value", state).text(state);
-        });
-        const yearFilter = d3.select("#yearFilter");
-        uniqueYears.forEach(year => {
-            yearFilter.append("option").attr("value", year).text(year);
-        });
-        renderStateOffenseChart(data, "All", "All");
-        stateFilter.on("change", function() {
-            const selectedState = this.value;
-            const selectedYear = yearFilter.node().value;
-            renderStateOffenseChart(data, selectedState, selectedYear);
-        });
-        yearFilter.on("change", function() {
-            const selectedYear = this.value;
-            const selectedState = stateFilter.node().value;
-            renderStateOffenseChart(data, selectedState, selectedYear);
-        });
-    })
-    .catch(function(error) {
-        console.error("Error loading JSON data:", error);
-  });
-  
-  function renderStateOffenseChart(data, selectedState, selectedYear) {
-    let filteredData = data.state_offense_data;
-    if (selectedState !== "All") {
-        filteredData = filteredData.filter(entry => entry.state_name === selectedState);
-    }
-    if (selectedYear !== "All") {
-        filteredData = filteredData.filter(entry => entry.data_year === parseInt(selectedYear));
-    }
-    const offenseCount = {};
-    filteredData.forEach(entry => {
-        if (!offenseCount[entry.offense_name]) {
-            offenseCount[entry.offense_name] = 0;
-        }
-        offenseCount[entry.offense_name] += entry.count;
-    });
-    const sortedOffenses = Object.keys(offenseCount).sort((a, b) => offenseCount[b] - offenseCount[a]).slice(0, 10);
-    const topOffenseCounts = sortedOffenses.map(offense => offenseCount[offense]);
+function createOffenseChart(data) {
+	
+	// Create a dictionary with chart data
+	const chartDict = {};
+    data.forEach(entry => { chartDict[entry.offense] = entry.incidents });
+    
+	// Extract lists for trace - sort and slice to get top 10 states with the highest incident rates
+    const offenses = Object.keys(chartDict).sort((a, b) => chartDict[b] - chartDict[a]).slice(0, 10).reverse();
+    const incidents = offenses.map(offense => chartDict[offense]);
+    
+	// Create trace for chart and store in a data array
     const chartData = [{
         type: 'bar',
-        x: topOffenseCounts,
-        y: sortedOffenses,
-        orientation: 'h'
+        x: incidents,
+        y: offenses,
+        orientation: 'h',
+		marker: { color: '#FFBF00' }
     }];
+
+	// Specify the layout options for the chart
     const layout = {
-        title: `Top 10 Hate Crimes by Offense in ${selectedState} for ${selectedYear}`,
-        yaxis: { title: "Offense Name", automargin: true },
-        xaxis: { title: "Count" },
-        margin: { l: 250 }
+		yaxis: {
+			automargin: true,
+			// Use transparent tick to add spacing between labels and axis
+			ticks: 'outside',
+			tickcolor: 'rgba(0,0,0,0)',
+			ticklen: 5
+		},
+        xaxis: {
+			title: { text: 'Incidents', standoff: 15 },
+			griddash: 'dot',
+			gridcolor: 'rgba(255,255,255,.1)',
+			// Use transparent tick to add spacing between labels and axis
+			ticks: 'outside',
+			tickcolor: 'rgba(0,0,0,0)',
+			ticklen: 3
+		},
+		font: { color: 'white'},
+		paper_bgcolor: 'rgba(0,0,0,0)',
+		plot_bgcolor: 'rgba(0,0,0,0)',
+		margin: {t: 20, r: 25, b: 70, l: 25},
+		height: 375
     };
-    Plotly.newPlot("chart4", chartData, layout);
+    
+	// Ensure chart adjust size to accomodate Bootstap's responsive layout
+	const config = {responsive: true}
+
+	// Render the chart in the specified container
+    Plotly.newPlot("offenseChart", chartData, layout, config);
 }
+
+function createIncRateChart(chartDict) {
+
+	// Remove all from dictionary
+	delete chartDict['All'];
+
+	// Extract lists for trace, sort and slice to get top 10 states with the highest incident rates
+    const states = Object.keys(chartDict).sort((a, b) => chartDict[b].incident_rate - chartDict[a].incident_rate).slice(0, 10).reverse();
+    const incident_rate = states.map(state => chartDict[state].incident_rate);
+    const population = states.map(state => 'Population: ' + chartDict[state].population.toLocaleString() + 'M');
+    
+    const chartData = [{
+      	x: incident_rate,
+      	y: states,
+      	text: population,
+      	type: 'bar',
+      	orientation: 'h',
+		marker: { color: '#FFBF00' }
+    }];
+    
+	// Specify the layout options for the chart
+    const layout = {
+      	yaxis: {
+			automargin: true,
+			// Use transparent tick to add spacing between labels and axis
+			ticks: 'outside',
+			tickcolor: 'rgba(0,0,0,0)',
+			ticklen: 5
+		},
+      	xaxis: {
+			title: { text: 'Incidents per 10M people', standoff: 18 },
+			griddash: 'dot',
+			gridcolor: 'rgba(255,255,255,.1)',
+			ticks: 'outside',
+			tickcolor: 'rgba(0,0,0,0)',
+			ticklen: 3
+		},
+		font: { color: 'white'},
+		paper_bgcolor: 'rgba(0,0,0,0)',
+		plot_bgcolor: 'rgba(0,0,0,0)',
+		height: 375,
+		margin: {t: 20, r: 15, b: 70, l: 15}
+		
+    };
+    
+	// Ensure chart adjust size to accomodate Bootstap's responsive layout
+	const config = {responsive: true}
+
+    // Render the chart in the specified container
+    Plotly.newPlot('chartIncRate', chartData, layout, config);
+
+	// Return dictionary for updating map information
+	return chartDict
+    
+  }
