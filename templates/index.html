@@ -6,104 +6,154 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Hate Crimes in the US</title>
+    
+    <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-    <style>
-        body {
-            background-color: #1a1a2e;
-            color: #e0e0e0;
-            font-family: 'Arial', sans-serif;
-        }
-        
-        .jumbotron {
-            background: linear-gradient(to right, #0062E6, #33AEFF);
-            color: white;
-        }
 
-        h1, h5 {
-            font-family: 'Verdana', sans-serif;
-        }
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+    integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+    crossorigin="" />
 
-        .well {
-            background-color: #25274d;
-            border-radius: 5px;
-            padding: 20px;
-            margin: 20px 0;
-        }
-
-        select {
-            width: 100%;
-            padding: 10px;
-            margin-top: 10px;
-            background-color: #3a3f58;
-            color: white;
-            border: none;
-        }
-    </style>
+    <!-- Custom CSS -->
+    <link rel="stylesheet" type="text/css" href="static/css/style.css">
 </head>
 
 <body>
-    <div class="container mt-5"> 
+    <div class="container-md"> 
         <div class="row">
             <div class="col-md-12 jumbotron text-center">
-                <h1>Hate Crimes in the United States</h1>
-                <p>Use the interactive charts below to explore the dataset</p>
+                <!-- <h1>Hate Crime in America</h1>  -->
+                <img src="./static/images/title6.png">
             </div>
         </div>
-
         <div class="row">
-            <div class="col-md-2"></div>
-            <div class="col-md-10 mb-4">
-                <div id="chart2"></div>
+            
+            <!-- State/US Panel Information -->
+            <div class="col-md-2 mb-4">           
+                <div class="panel panel-primary panel-left">
+                    <div class="panel-heading text-center">
+                        <h5 id="infoState" class="panel-title"></h5>
+                    </div>
+                </div>
+                <div class="panel panel-primary panel-info">
+                    <div class="panel-label text-center"> 
+                        <h6>Incidents</h6>
+                    </div>
+                    <div class="panel-value  text-center">
+                        <h4 id="infoInc" > </h3>
+                    </div>
+                </div>  
+                <div class="panel panel-primary panel-info">
+                    <div class="panel-label text-center">    
+                        <h6>Population</h6>
+                    </div>
+                    <div class="panel-value text-center">
+                        <h4 id="infoPop"></h4>
+                    </div>
+                </div>
+                <div class="panel panel-primary panel-info">
+                    <div class="panel-label text-center">    
+                        <h6>Incident Rate</h6>
+                    </div>
+                    <div class="panel-value text-center">  
+                        <div><h4 id="infoRate"> </h4></div>   
+                        <div class="text-center">incidents per 10M population</div>
+                    </div>
+                </div>
+                <div id="info-message" class="text-center">Numbers above are averages for all years</div>
             </div>
-        </div>
-
-        <div class="row">
+            
+            <!-- US Map -->
+            <div class="col-md-8 mb-4">
+                <div id="map" class="mx-auto"></div>
+            </div>
+            
+             <!-- Dropdown Filters -->
             <div class="col-md-2">
                 <div class="well">
-                    <h5>State</h5>
-                    <select id="selDataset"></select>
+                    <h6>Year</h6>
+                    <select id="selYear" onchange="refreshData()"></select>
                 </div>
-            </div>
-            <div class="col-md-10">
-                <div id="chart1" class="mb-4"></div>
+                <div class="well">
+                    <h6>State</h6>
+                    <select id="selState" onchange="refreshData()"></select>
+                </div>
+                <div class="well">
+                    <h6>Bias Category</h6>
+                    <select id="selBias" onchange="refreshData()"></select>
+                </div>
+                <div></br></div>
             </div>
         </div>
-
+        <div class="row">  
+            
+            <!-- Bias Category Line Chart -->
+            <div class="col-md-8 mb-4">
+                <div class="panel-primary panel-left">
+                    <div class="panel-heading">
+                        <h5>Hate Crimes by Bias Category Over Time</h5>
+                    </div>
+                    <div id="biasChart" class="chart mx-auto"></div>
+                </div>  
+            </div>
+            
+             <!-- Bias Category Pie Chart -->
+            <div class="col-md-4 mb-4">
+                <div class="panel-primary panel-right">
+                    <div class="panel-heading">
+                        <h5>Hate Crimes by Bias Category</h5>
+                    </div>
+                    <div id="biasPieChart" class="chart mx-auto"></div>
+                </div>
+            </div> 
+        </div>
         <div class="row">
-            <div class="col-md-2">
-                <div class="well">
-                    <h5>Year</h5>
-                    <select id="selYear"></select>
+            
+            <!-- Incident Rate Chart -->
+            <div class="col-md-4 mb-4">                
+                <div class="panel-primary panel-left">
+                    <div class="panel-heading">
+                        <h5>Top 10 States by Incident Rate</h5>
+                    </div>    
+                    <div id="chartIncRate" class="chart mx-auto"></div>
                 </div>
             </div>
-            <div class="col-md-5">
-                <div id="top10bar1" class="mb-4"></div>
-            </div>
-            <div class="col-md-5">
-                <div id="top10bar2" class="mb-4"></div>
+
+            <!-- Offenses Chart -->
+            <div class="col-md-8 mb-4">
+                <div class="panel-primary panel-right">
+                    <div class="panel-heading">
+                        <h5>Top 10 Hate Crime Offenses</h5>
+                    </div>
+                    <div id="offenseChart" class="chart mx-auto"></div>
+                </div>
             </div>
         </div>
-
         <div class="row">
-            <div class="col-md-2">
-                <div class="well">
-                    <h5>Year</h5>
-                    <select id="yearFilter"></select>
-                </div>
-                <div class="well">
-                    <h5>State</h5>
-                    <select id="stateFilter"></select>
-                </div>
-            </div>
-            <div class="col-md-10">
-                <div id="chart4"></div>
+            
+            <!-- Footer -->
+            <div class="col-md-12 mb-4">
+                <div id="info-footer">Created by Jeff DuBois | Datasources: FBI <a href="https://cde.ucr.cjis.gov" target="_blank" rel="noreferrer noopener">(https://cde.ucr.cjis.gov)</a>, US Census Bureau <a href="https://data.census.gov" target="_blank" rel="noreferrer noopener">(https://data.census.gov)</a></div>
             </div>
         </div>
     </div>
 
+    <!-- D3 JS -->
     <script src="https://d3js.org/d3.v5.min.js"></script>
+
+    <!-- Plotly JS -->
     <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
-    <script src="./static/js/app.js"></script>
+    
+    <!-- Leaflet JS -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+    integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+    crossorigin=""></script>
+
+    <!-- App JS -->
+    <script type="text/javascript" src="./static/js/us-states-geo-data.js"></script>
+    <script type="text/javascript" src="./static/js/map.js"></script>
+    <script type="text/javascript" src="./static/js/app.js"></script>
 
 </body>
 
