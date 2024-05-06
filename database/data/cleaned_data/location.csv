@@ -1,0 +1,47 @@
+location_id,location
+0,ATM Separate from Bank
+1,Abandoned/Condemned Structure
+2,Air/Bus/Train Terminal
+3,Amusement Park
+4,Arena/Stadium/Fairgrounds/Coliseum
+5,Auto Dealership New/Used
+6,Bank/Savings and Loan
+7,Bar/Nightclub
+8,Camp/Campground
+9,Church/Synagogue/Temple/Mosque
+10,Commercial/Office Building
+11,Community Center
+12,Construction Site
+13,Convenience Store
+14,Cyberspace
+15,Daycare Facility
+16,Department/Discount Store
+17,Dock/Wharf/Freight/Modal Terminal
+18,Drug Store/Doctor's Office/Hospital
+19,Farm Facility
+20,Field/Woods
+21,Gambling Facility/Casino/Race Track
+22,Government/Public Building
+23,Grocery/Supermarket
+24,Highway/Road/Alley/Street/Sidewalk
+25,Hotel/Motel/Etc.
+26,Industrial Site
+27,Jail/Prison/Penitentiary/Corrections Facility
+28,Lake/Waterway/Beach
+29,Liquor Store
+30,Military Installation
+31,Other/Unknown
+32,Park/Playground
+33,Parking/Drop Lot/Garage
+34,Rental Storage Facility
+35,Residence/Home
+36,Rest Area
+37,Restaurant
+38,School-College/University
+39,School-Elementary/Secondary
+40,School/College
+41,Service/Gas Station
+42,Shelter-Mission/Homeless
+43,Shopping Mall
+44,Specialty Store
+45,Tribal Lands

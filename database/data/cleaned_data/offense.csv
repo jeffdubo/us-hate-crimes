@@ -1,0 +1,50 @@
+offense_id,offense,code,offense_category,crimes_against
+0,Aggravated Assault,13A,Assault Offenses,Person
+1,All Other Larceny,23H,Larceny/Theft Offenses,Property
+2,Animal Cruelty,720,Animal Cruelty Offenses,Society
+3,Arson,200,Arson,Property
+4,Assisting or Promoting Prostitution,40B,Prostitution Offenses,Society
+5,Betting/Wagering,39A,Gambling Offenses,Society
+6,Bribery,510,Bribery,Property
+7,Burglary/Breaking & Entering,220,Burglary/Breaking & Entering,Property
+8,Counterfeiting/Forgery,250,Counterfeiting/Forgery,Property
+9,Credit Card/Automated Teller Machine Fraud,26B,Fraud Offenses,Property
+10,Destruction/Damage/Vandalism of Property,290,Destruction/Damage/Vandalism of Property,Property
+11,Drug Equipment Violations,35B,Drug/Narcotic Offenses,Society
+12,Drug/Narcotic Violations,35A,Drug/Narcotic Offenses,Society
+13,Embezzlement,270,Embezzlement,Property
+14,Extortion/Blackmail,210,Extortion/Blackmail,Property
+15,False Pretenses/Swindle/Confidence Game,26A,Fraud Offenses,Property
+16,Fondling,11D,Sex Offenses,Person
+17,Gambling Equipment Violations,39C,Gambling Offenses,Society
+18,Hacking/Computer Invasion,26G,Fraud Offenses,Property
+19,"Human Trafficking, Commercial Sex Acts",64A,Human Trafficking,Person
+20,Identity Theft,26F,Fraud Offenses,Property
+21,Impersonation,26C,Fraud Offenses,Property
+22,Incest,36A,Sex Offenses,Person
+23,Intimidation,13C,Assault Offenses,Person
+24,Kidnapping/Abduction,100,Kidnapping/Abduction,Person
+25,Motor Vehicle Theft,240,Motor Vehicle Theft,Property
+26,Murder and Nonnegligent Manslaughter,09A,Homicide Offenses,Person
+27,Negligent Manslaughter,09B,Homicide Offenses,Person
+28,Not Specified,NA,Not Specified,Not Specified
+29,Pocket-picking,23A,Larceny/Theft Offenses,Property
+30,Pornography/Obscene Material,370,Pornography/Obscene Material,Society
+31,Prostitution,40A,Prostitution Offenses,Society
+32,Purchasing Prostitution,40C,Prostitution Offenses,Society
+33,Purse-snatching,23B,Larceny/Theft Offenses,Property
+34,Rape,11A,Sex Offenses,Person
+35,Robbery,120,Robbery,Property
+36,Sexual Assault With An Object,11C,Sex Offenses,Person
+37,Shoplifting,23C,Larceny/Theft Offenses,Property
+38,Simple Assault,13B,Assault Offenses,Person
+39,Sodomy,11B,Sex Offenses,Person
+40,Statutory Rape,36B,Sex Offenses,Person
+41,Stolen Property Offenses,280,Stolen Property Offenses,Property
+42,Theft From Building,23D,Larceny/Theft Offenses,Property
+43,Theft From Coin-Operated Machine or Device,23E,Larceny/Theft Offenses,Property
+44,Theft From Motor Vehicle,23F,Larceny/Theft Offenses,Property
+45,Theft of Motor Vehicle Parts or Accessories,23G,Larceny/Theft Offenses,Property
+46,Weapon Law Violations,520,Weapon Law Violations,Society
+47,Welfare Fraud,26D,Fraud Offenses,Property
+48,Wire Fraud,26E,Fraud Offenses,Property

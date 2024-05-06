@@ -1,0 +1,72 @@
+Offense,Code,Offense Description,Crime Against
+Animal Cruelty Offenses,720,Animal Cruelty,Society
+Arson,200,Arson,Property
+Assault Offenses,13A,Aggravated Assault,Person
+Assault Offenses,13B,Simple Assault,Person
+Assault Offenses,13C,Intimidation,Person
+Bribery,510,Bribery,Property
+Burglary/Breaking & Entering,220,Burglary/Breaking & Entering,Property
+Commerce Violations,58A,Import Violations*,Society
+Commerce Violations,58B,Export Violations*,Society
+Commerce Violations,61A,Federal Liquor Offenses*,Society
+Commerce Violations,61B,Federal Tobacco Offenses*,Society
+Commerce Violations,620,Wildlife Trafficking*,Society
+Counterfeiting/Forgery,250,Counterfeiting/Forgery,Property
+Destruction/Damage/Vandalism of Property,290,Destruction/Damage/Vandalism of Property,Property
+Drug/Narcotic Offenses,35A,Drug/Narcotic Violations,Society
+Drug/Narcotic Offenses,35B,Drug Equipment Violations,Society
+Embezzlement,270,Embezzlement,Property
+Espionage,103,Espionage*,Society
+Extortion/Blackmail,210,Extortion/Blackmail,Property
+Fraud Offenses,26A,False Pretenses/Swindle/Confidence Game,Property
+Fraud Offenses,26B,Credit Card/Automated Teller Machine Fraud,Property
+Fraud Offenses,26C,Impersonation,Property
+Fraud Offenses,26D,Welfare Fraud,Property
+Fraud Offenses,26E,Wire Fraud,Property
+Fraud Offenses,26F,Identity Theft,Property
+Fraud Offenses,26G,Hacking/Computer Invasion,Property
+Fraud Offenses,26H,Money Laundering*,Society
+Gambling Offenses,39A,Betting/Wagering,Society
+Gambling Offenses,39B,Operating/Promoting/Assisting Gambling,Society
+Gambling Offenses,39C,Gambling Equipment Violations,Society
+Gambling Offenses,39D,Sports Tampering,Society
+Homicide Offenses,09A,Murder and Nonnegligent Manslaughter,Person
+Homicide Offenses,09B,Negligent Manslaughter,Person
+Homicide Offenses,09C,Justifiable Homicide,Not a Crime
+Immigration Violations,30A,Illegal Entry into the United States*,Society
+Immigration Violations,30B,False Citizenship*,Society
+Immigration Violations,30C,Smuggling Aliens*,Society
+Immigration Violations,30D,Re-entry after Deportation*,Society
+Human Trafficking,64A,"Human Trafficking, Commercial Sex Acts",Person
+Human Trafficking,64B,"Human Trafficking, Involuntary Servitude",Person
+Kidnapping/Abduction,100,Kidnapping/Abduction,Person
+Fugitive Offenses,49A,Harboring Escapee/ Concealing from Arrest*,Society
+Fugitive Offenses,49B,Flight to Avoid Prosecution*,Society
+Fugitive Offenses,49C,Flight to Avoid Deportation*,Society
+Larceny/Theft Offenses,23A,Pocket-picking,Property
+Larceny/Theft Offenses,23B,Purse-snatching,Property
+Larceny/Theft Offenses,23C,Shoplifting,Property
+Larceny/Theft Offenses,23D,Theft From Building,Property
+Larceny/Theft Offenses,23E,Theft From Coin-Operated Machine or Device,Property
+Larceny/Theft Offenses,23F,Theft From Motor Vehicle,Property
+Larceny/Theft Offenses,23G,Theft of Motor Vehicle Parts or Accessories,Property
+Larceny/Theft Offenses,23H,All Other Larceny,Property
+Motor Vehicle Theft,240,Motor Vehicle Theft,Property
+Pornography/Obscene Material,370,Pornography/Obscene Material,Society
+Prostitution Offenses,40A,Prostitution,Society
+Prostitution Offenses,40B,Assisting or Promoting Prostitution,Society
+Prostitution Offenses,40C,Purchasing Prostitution,Society
+Robbery,120,Robbery,Property
+Sex Offenses,11A,Rape,Person
+Sex Offenses,11B,Sodomy,Person
+Sex Offenses,11C,Sexual Assault With An Object,Person
+Sex Offenses,11D,Fondling,Person
+Sex Offenses,36A,Incest,Person
+Sex Offenses,36B,Statutory Rape,Person
+Sex Offenses,360,Failure to Register as a Sex Offender*,Society
+Stolen Property Offenses,280,Stolen Property Offenses,Property
+Treason,101,Treason*,Society
+Weapon Law Violations,520,Weapon Law Violations,Society
+Weapon Law Violations,521,Violation of National Firearm Act of 1934*,Society
+Weapon Law Violations,522,Weapons of Mass Destruction*,Society
+Weapon Law Violations,526,Explosives*,Society
