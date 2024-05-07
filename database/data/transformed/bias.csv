@@ -1,0 +1,35 @@
+bias_id,bias,bias_category
+0,Anti-Black or African American,"Race, Ethnicity or Ancestry"
+1,Anti-Hispanic or Latino,"Race, Ethnicity or Ancestry"
+2,Anti-Arab,"Race, Ethnicity or Ancestry"
+3,Anti-Asian,"Race, Ethnicity or Ancestry"
+4,Anti-American Indian or Alaska Native,"Race, Ethnicity or Ancestry"
+5,Anti-Native Hawaiian or Other Pacific Islander,"Race, Ethnicity or Ancestry"
+6,Anti-White,"Race, Ethnicity or Ancestry"
+7,Anti-Other Race/Ethnicity/Ancestry,"Race, Ethnicity or Ancestry"
+8,"Anti-Multiple Races, Group","Race, Ethnicity or Ancestry"
+9,Anti-Jewish,Religion
+10,Anti-Protestant,Religion
+11,Anti-Other Religion,Religion
+12,Anti-Islamic (Muslim),Religion
+13,Anti-Catholic,Religion
+14,"Anti-Multiple Religions, Group",Religion
+15,Anti-Atheism/Agnosticism,Religion
+16,Anti-Buddhist,Religion
+17,Anti-Sikh,Religion
+18,Anti-Other Christian,Religion
+19,Anti-Hindu,Religion
+20,"Anti-Eastern Orthodox (Russian, Greek, Other)",Religion
+21,Anti-Jehovah's Witness,Religion
+22,Anti-Church of Jesus Christ,Religion
+23,Anti-Physical Disability,Disability
+24,Anti-Mental Disability,Disability
+25,Anti-Female,Gender
+26,Anti-Male,Gender
+27,Anti-Gender Non-Conforming,Gender Identity
+28,Anti-Transgender,Gender Identity
+29,Anti-Gay (Male),Sexual Orientation
+30,Anti-Lesbian (Female),Sexual Orientation
+31,Anti-Bisexual,Sexual Orientation
+32,Anti-Heterosexual,Sexual Orientation
+33,"Anti-Lesbian, Gay, Bisexual, or Transgender (Mixed Group)",Sexual Orientation
