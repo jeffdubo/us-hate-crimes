@@ -106,7 +106,7 @@ These instructions assume you have installed and are familiar with postgreSQL an
 ## Data
 
 ### Sources
-* FBI Hate Crime Data: https://cde.ucr.cjis.gov/LATEST/webapp/#/pages/downloads#datasets
+* FBI Hate Crime Data: <a href="https://cde.ucr.cjis.gov/LATEST/webapp/#/pages/downloads#datasets" target="_blank">https://cde.ucr.cjis.gov/LATEST/webapp/#/pages/downloads#datasets</a>
 * FBI NIBRS Group A Offenses: https://le.fbi.gov/file-repository/nibrs-technical-specification-063023.pdf/view
 * US Census Bureau Bike Commuting Data (2022 ACS5 Table S0802): https://data.census.gov/table/ACSST5Y2022.S0802?q=commuting
 
@@ -114,7 +114,7 @@ These instructions assume you have installed and are familiar with postgreSQL an
 
 * FBI Hate Crime Data: This only available as a csv file and was downloaded using the URL above.
 * FBI NIBRS Group A Offenses: This was only available in the linked pdf above. The data was copied from a table in Appendix A on page 212, pasted into an Excel spreadsheet and then saved as a CSV file.
-* US Census Bureau Bike Commuting Data: The URL above helped identify the field names needed to import the data into a pandas dataframe using the census python package ([pypi.org/project/census](https://pypi.org/project/census/)).
+* US Census Bureau Bike Commuting Data: The URL above helped identify the field names needed to import the data into a pandas dataframe using the <a href="https://pypi.org/project/census/" target="_blank">census python package</a>.
 
 ### Processing
 
