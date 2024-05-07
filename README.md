@@ -106,7 +106,7 @@ These instructions assume you have installed and are familiar with postgreSQL an
 ## Data
 
 ### Sources
-* FBI Hate Crime Data: <a href="https://cde.ucr.cjis.gov/LATEST/webapp/#/pages/downloads#datasets" target="_blank">https://cde.ucr.cjis.gov/LATEST/webapp/#/pages/downloads#datasets</a>
+* FBI Hate Crime Data: <a href="https://cde.ucr.cjis.gov/LATEST/webapp/#/pages/downloads#datasets" target="_blank">Test</a>
 * FBI NIBRS Group A Offenses: https://le.fbi.gov/file-repository/nibrs-technical-specification-063023.pdf/view
 * US Census Bureau Bike Commuting Data (2022 ACS5 Table S0802): https://data.census.gov/table/ACSST5Y2022.S0802?q=commuting
 
