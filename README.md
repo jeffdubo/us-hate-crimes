@@ -14,13 +14,18 @@ An interactive web application to investigate hate crime in America between 2009
     * [Software Requirements](#software-requirements)
     * [General Instructions](#general-instructions)
     * [PostgreSQL Database Instructions](#postgresql-database-instructions)
-* [A]
 * [Data](#data)
-    * [Data Sources](#data-sources)
-    * [Data Aquisition](#data-acquisition)
-    * [Data Processing](#data-processing)
-
-
+    * [Sources](#sources)
+    * [Aquisition](#acquisition)
+    * [Processing](#processing)
+* [Database Structure](#database-structure)
+    * [ERD](#erd)
+    * [Schema](#schema)
+* [Repository Structure](#repository-structure)
+* [Results and Evaluation](#results-and-evaluation)
+* [Future Work](#future-work)
+* [Acknowledgements/References](#acknowledgements/references)
+* [License](#license)
 
 ## Overview
 
@@ -86,9 +91,9 @@ Note: PostgreSQL software is not needed if using the SQLite database.
 ### PostgreSQL Database Instructions
 These instructions assume you have installed and are familiar with postgreSQL and pgAdmin.
 1. Open pgAdmin and create a database.
-2. Use the Query Tool to open the file hate_crime_schema.sql. 
+2. Use the Query Tool to open the file [hate_crime_schema.sql](database/schema-erd/hate_crime_schema.sql). 
 3. Highlight and run the code for each table and view. 
-4. Right click on each table on the panel and import the corresponding csv file stored in the data\database_files directory. Important: Import the files in the order that the tables were created to avoid errors due to foreign key constraints.
+4. Right click on each table on the panel and import the corresponding csv file stored in the [database/data/transformed directory](database/data/transformed). Important: Import the files in the order that the tables were created to avoid errors due to foreign key constraints.
 
 ### Application Usage
 1. Follow installation instructions above.
@@ -100,33 +105,46 @@ These instructions assume you have installed and are familiar with postgreSQL an
 
 ## Data
 
-### Data Sources
+### Sources
 * FBI Hate Crime Data: https://cde.ucr.cjis.gov/LATEST/webapp/#/pages/downloads#datasets
 * FBI NIBRS Group A Offenses: https://le.fbi.gov/file-repository/nibrs-technical-specification-063023.pdf/view
 * US Census Bureau Bike Commuting Data (2022 ACS5 Table S0802): https://data.census.gov/table/ACSST5Y2022.S0802?q=commuting
 
-### Data Acquisition
+### Acquisition
 
-* FBI Hate Crime Data: This only available as an Excel spreadsheet and was downloaded using the URL above.
+* FBI Hate Crime Data: This only available as a csv file and was downloaded using the URL above.
 * FBI NIBRS Group A Offenses: This was only available in the linked pdf above. The data was copied from a table in Appendix A on page 212, pasted into an Excel spreadsheet and then saved as a CSV file.
 * US Census Bureau Bike Commuting Data: The URL above helped identify the field names needed to import the data into a pandas dataframe using the census python package ([pypi.org/project/census](https://pypi.org/project/census/)).
 
-### Data Processing
+### Processing
+
+* 
+## Database Structure
+
+### ERD
+
+The following Entity Relationship Diagram (ERD) was created using pgAdmin.
+
+![hate_crimes_ERD.png](database/schema-erd/hate_crimes_ERD.png)
+
+Something about normalization
+
+### Schema
 
 
-## Code Structure
+## Repository Structure
 
-This repository contains the following files:
-1. README.md - This file
-2. app.py - Python file for flask application
-3. render_reqs.txt - Text file used by hosting service, Render.com. This file contains a list of all Python libraries needed to host the website.
-4. etl\ - Folder with Jupyter and Python files for data extraction and transformation
-5. etl\data - Folder with exported CSV files for loading the database
-6. etl\schema-erd - Folder with ERD and SQL files to create PostgreSQL database
-7. static\js - Folder with all Javascript files for web page
-8. resources - Source data files for ETL and support documents from data source
-9. templates - Folder for HTML files (SQLAlchemy requires files in this folder to render them from a Flask app
-
+This repository is organized into the following folders:
+* database - python code for data processing and sqlite database creation as well as the resulting sqlite database
+* database/schema-erd - sql code to create PostgreSQL database and ERD diagram
+* database/source_data - FBI source data
+* database/transformed_data - csv files for database tables
+* images - image files for this README
+* resources - documentation and technical specification for hate crime reporting and data collection
+* static - folders for css, javascript, and images for dashboard
+* templates - dashboard home page
+* testing - sql and python code used during testing and development 
+* root directory - application code, configuration files, licenses and this readme.
 
 ## Results and Evaluation
 
@@ -134,9 +152,10 @@ This repository contains the following files:
 
 ### Evaluation
 
+Limitations
 There were several challenges in this project:
 1. FBI Hate Crime Dataset - Several fields in the dataset (offense, bias, location, victim type) contained multiple values in one record. These were distiguished as separate records during extraction and transformation but resulted in a complex schema and normalized PostgreSQL database. The dataset also did not include information regarding the city or state where the hate crime was committed. It did include information regarding the reporting agency which included the state and in some cases the city as the name or unit of the agency. The dashboards were based on this state field and it's very possible that some of the incidents occurred in a different state from the reporting agency. This was not noted in any documentation on the FBI site.
-2. Party Control by State - The initial question posed by the team was 1) is there a relationship between the increase or decrease of hate crimes based on the political climate over time and 2) is there a relationship between hate crimes and local political affiliation by state. After much onine research, the only available free data were annual pdfs from the National Conference of State Legislatures (NCSL). The team was able to extract data from these pdfs using a tabula-py, a wrapper for tabula-java, a java library, but there was not sufficent time to fully clean and transform the data into validated csv files.
+
 3. PostgreSQL Database - As stated above, the normalized PostgreSQL database was complex and contained many tables and relationships. The process of extracting and transforming the data into csv files to create the database was time-consuming and delayed the creation of the flask apps and dashboards. As a result, some of the flask apps were based on a table that mirrored the initial hate critme dataset with multiple values in one record. In hindsight, it may have been more effective to use MongoDB or simplify the database schema.
 4. Database and Website Hosting - The advantage of using a hosting service (Render) was the ability for everyone to use the same database and test the code and html using the same service, rather than doing this locally. The challenge in this was learning how to publish the database and website for Render and then discovering the limitations of their free plan, specifically the reliability of remote connections when the hosted server spun down due to inactivity. Although a final published site is up and running, local testing was most effective.
 5. Github - The group is still learning Github and the best way to effectively manage and merge code. Juypter notebooks for data cleaning were not integrated and some code in the app.py and app.js needed to be manually updated in the main branch due to merging issues.
@@ -149,13 +168,12 @@ There were several challenges in this project:
 
 ## Acknowledgments/References
 
+This project was based on a group assignment I completed as part of [UC Berkeley's Data Analyst Boot Camp](https://bootcamp.berkeley.edu/data/data). Although I rewrote the code, modified the database schema, and redesigned the dashboard, I'd like to thank the following group members for their work and inspirations throughout the [original project](https://github.com/evacs/Project-3): Matt Calvert, Ahn-Tu Pham, Eva Schmidt, John Shridhik and Tenzin Zenor.
 
+I'd also like to acknowledge the following resources:
+*  FBI Uniform Crime Reporting (UCR) Program - This program aggregates all hate crime offenses reported by law enforcement agencies and maintains data collection guidelines, training materials and annual updates to their methodology. This information was critical to understanding and evaluating the hate crime data.
+*  FBI National Incident-Based Reporting System (NIBRS) - This system was created to improve the overall quality of crime data collected by law enforcement. They maintain and update technical specifications for reporting that included categorical information and codes for all group A offenses.  
 
-## Repository Contents
+## License
 
-
-
-## Conclusions
-
-
-
+This project is licensed under the [MIT license](LICENSE.txt).
