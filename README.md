@@ -93,7 +93,7 @@ These instructions assume you have installed and are familiar with postgreSQL an
 1. Open pgAdmin and create a database.
 2. Use the Query Tool to open the file [hate_crime_schema.sql](database/schema-erd/hate_crime_schema.sql). 
 3. Highlight and run the code for each table and view. 
-4. Right click on each table on the panel and import the corresponding csv file stored in the [database/data/transformed directory](database/data/transformed). Important: Import the files in the order that the tables were created to avoid errors due to foreign key constraints.
+4. Right click on each table on the panel and import the corresponding csv file stored in the [database/transformed_data directory](database/transformed_data). Important: Import the files in the order that the tables were created to avoid errors due to foreign key constraints.
 
 ### Application Usage
 1. Follow installation instructions above.
@@ -135,15 +135,15 @@ Something about normalization
 ## Repository Structure
 
 This repository is organized into the following folders:
-* database - python code for data processing and sqlite database creation as well as the resulting sqlite database
-* database/schema-erd - sql code to create PostgreSQL database and ERD diagram
-* database/source_data - FBI source data
-* database/transformed_data - csv files for database tables
-* images - image files for this README
-* resources - documentation and technical specification for hate crime reporting and data collection
-* static - folders for css, javascript, and images for dashboard
-* templates - dashboard home page
-* testing - sql and python code used during testing and development 
+* [database](database) - python code for data processing and sqlite database creation as well as the resulting sqlite database
+* [database/schema-erd](database/schema-erd) - sql code to create PostgreSQL database and ERD diagram
+* [database/source_data](database/source_data) - FBI source data
+* [database/transformed_data](database/transformed_data) - csv files for database tables
+* [images](images) - image files for this README
+* [resources](resources) - documentation and technical specification for hate crime reporting and data collection
+* [static](static) - folders for css, javascript, and images for dashboard
+* [templates](templates) - dashboard home page
+* [testing](testing) - sql and python code used during testing and development 
 * root directory - application code, configuration files, licenses and this readme.
 
 ## Results and Evaluation
