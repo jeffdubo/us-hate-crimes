@@ -1,6 +1,5 @@
 # Project exclusions
 config.py
-data
 fbi_hate_crime_data.csv
 
 # Byte-compiled / optimized / DLL files
