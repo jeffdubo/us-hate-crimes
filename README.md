@@ -21,6 +21,7 @@ An interactive web application to investigate hate crime in America between 2009
 * [Database Structure](#database-structure)
     * [ERD](#erd)
     * [Schema](#schema)
+* [Web Application](#web-application)
 * [Repository Structure](#repository-structure)
 * [Results and Evaluation](#results-and-evaluation)
 * [Future Work](#future-work)
@@ -59,35 +60,35 @@ Note: PostgreSQL software is not needed if using the SQLite database.
 ### General Instructions
 1. Verify the above software requirements and dependencies have been meet on your computer.
 2. Clone this repository.
-3. If creating a postgreSQL database...
-    * Follow the instructions in the section below to create the database.
-    * Edit the config_blank.py file and update the variables with your postgreSQL database information.
-        ```
-        db_username = 'postgres' # Update this if you are not using this default postgreSQL username
-        db_password = '[your password]'
-        b_host = 'localhost'
-        db_port = 5432
-        db_name = '[name of your database]'
-        ```
-4. If using the existing SQLite database...
-    * Edit the config_blank.py file and set the flag to false.
-        ```
-        postgreSQL_flag = False.
-        ```
-4. Update the API key for the US Census Bureau in config_blank.py if you plan to import additional census information using the Juypter notebook ([/data_cleaning_us_census_data.ipynb]('/data_cleaning_us_census_data.ipynb')). Note: to get an API key, go to https://api.census.gov/data/key_signup.html.
+3. If creating a postgreSQL database, edit the [config_blank.py](config_blank.py) file and update the variables with your postgreSQL database information.
+    ```
+    db_username = '[username]' # Default in pgAdmin is postgres
+    db_password = '[your password]'
+    b_host = 'localhost'
+    db_port = 5432
+    db_name = '[name of your database]'
+    ```
+4. If using the existing SQLite database, edit the [config_blank.py](config_blank.py) file and set the flag to false.
+    ```
+    postgreSQL_flag = False.
+    ```
+5. After updating and saving config_blank.py, rename it to config.py.
+
+6. If you will be extracting census information using the [data_processing_hate_crime.ipynb](database/data_processing_hate_crime.ipynb) notebook, edit the [census_config_blank.py](database/census_config_blank.py) file in the database directory and update the variable with your API key. 
     ```
     census_key = '[your API key]'
     ```
-5. Rename [config_blank.py](config_blank.py) to config.py.
-6. Open a terminal and start the application.
+    You can get an API key at  https://api.census.gov/data/key_signup.html.
+7. After updating and saving config_blank.py, rename it to config.py.
+8. Open a terminal and start the application.
     ```
     python app.py
     ```
     If you are using a postgreSQL database and get a connection refused error message or a failure to connect to the server message, make sure postgreSQL is installed properly and the windows service is running.
-7. Open your Internet browser and go to http://127.0.0.1:5000.
-8. To stop the application, press CTRL+C in your terminal and close the browser tab.
+9. Open your Internet browser and go to http://127.0.0.1:5000.
+10. To stop the application, press CTRL+C in your terminal and close the browser tab.
 
-
+# Need to redo section below!!!
 ### PostgreSQL Database Instructions
 These instructions assume you have installed and are familiar with postgreSQL and pgAdmin.
 1. Open pgAdmin and create a database.
@@ -106,7 +107,7 @@ These instructions assume you have installed and are familiar with postgreSQL an
 ## Data
 
 ### Sources
-* FBI Hate Crime Data: <a href="https://cde.ucr.cjis.gov/LATEST/webapp/#/pages/downloads#datasets" target="_blank">Test</a>
+* FBI Hate Crime Data: https://cde.ucr.cjis.gov/LATEST/webapp/#/pages/downloads#datasets
 * FBI NIBRS Group A Offenses: https://le.fbi.gov/file-repository/nibrs-technical-specification-063023.pdf/view
 * US Census Bureau Bike Commuting Data (2022 ACS5 Table S0802): https://data.census.gov/table/ACSST5Y2022.S0802?q=commuting
 
@@ -114,22 +115,48 @@ These instructions assume you have installed and are familiar with postgreSQL an
 
 * FBI Hate Crime Data: This only available as a csv file and was downloaded using the URL above.
 * FBI NIBRS Group A Offenses: This was only available in the linked pdf above. The data was copied from a table in Appendix A on page 212, pasted into an Excel spreadsheet and then saved as a CSV file.
-* US Census Bureau Bike Commuting Data: The URL above helped identify the field names needed to import the data into a pandas dataframe using the <a href="https://pypi.org/project/census/" target="_blank">census python package</a>.
+* US Census Bureau Data: The URL above helped identify the field names needed to import the data into a pandas dataframe using the <a href="https://pypi.org/project/census/" target="_blank">census python package</a>.
 
 ### Processing
 
-* 
+The data was extracted from from the sources above and transformed to load into a database. The FBI data was processed using Python in a [Jupyter notebook](database/data_processing_us_census.ipynb) as follows:
+1. Hate crime data was extracted from a csv or xlsx file and columns reviewed.
+
+    ![fbi_data_extract.png](images/fbi_data_extract.png)
+    ![fbi_data_review.png](images/fbi_data_review.png)
+
+2. Data was cleaned removing unneeded rows and columns and columns with missing data (example below).
+
+    ![fbi_data_clean.png](images/fbi_data_clean.png)
+
+3. Data was normalized and a dataframe was created for each database table and exported to a csv (see example below).
+
+    ![fbi_data_normalize.png](images/fbi_data_normalize.png)
+
+The US Census Bureau data was processed using Python in a [Jupyter notebook](database/data_processing_hate_crime.ipynb) as follows:
+1. Population data for each year was extracted and reviewed.
+
+    ![census_data_extract.png](images/census_data_extract.png)
+    ![census_data_review.png](images/census_data_review.png)
+
+2. Data was transformed by transposing ethnicity columns, adding state abbreviations, and changing the data type for one column. (see transposition of ethnicity columns below).
+
+    ![census_data_transform.png](images/census_data_transform.png)
+
 ## Database Structure
 
 ### ERD
 
 The following Entity Relationship Diagram (ERD) was created using pgAdmin.
 
-![hate_crimes_ERD.png](database/schema-erd/hate_crimes_ERD.png)
+![db_ERD.png](database/schema_erd/db_erd.png)
 
 Something about normalization
 
 ### Schema
+
+## API Documentation
+
 
 
 ## Repository Structure
