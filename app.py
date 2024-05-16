@@ -89,7 +89,7 @@ def index():
     return render_template('index.html')
 
 # Get lists for select dropdowns to filter charts
-@app.route('/lists')
+@app.route('/api/lists')
 def get_lists():
     try:
         session = Session(engine)
@@ -119,20 +119,21 @@ def get_lists():
         print("Error accessing the table:", str(e))
         return jsonify({"error": "Table access failed"}), 500
 
-# Get data for all charts
-@app.route('/biasdata/<year>/<state>/<bias_category>')
-def get_data(year, state, bias_category):
+# Get data for bias charts
+@app.route('/api/biasdata/<state>')
+def get_data(state):
     
     # Call functions to get data for each chart
-    inc_list = get_inc_data(year, state, bias_category)
-    bias_list = get_bias_data(year, state, bias_category)
+    inc_list = get_inc_data(state)
+    bias_list = get_bias_data(state)
 
     # Create dictionary for return
     dataToReturn = {'incident': inc_list, 'bias': bias_list}   
 
     return jsonify(dataToReturn)
 
-@app.route('/offensedata/<year>/<state>/<bias_category>')
+# Get data for offense chart
+@app.route('/api/offensedata/<year>/<state>/<bias_category>')
 def get_offense_data(year, state, bias_category):
     
     # Call function to get data for each chart
@@ -144,12 +145,12 @@ def get_offense_data(year, state, bias_category):
     return jsonify(dataToReturn)
 
 
-# Get data for all charts
-@app.route('/ratedata/<year>/<state>/<bias_category>')
-def get_rate_data(year, state, bias_category):
+# Get data for incident rate chart
+@app.route('/api/ratedata/<year>/<bias_category>')
+def get_rate_data(year, bias_category):
     
     # Call functions to get data for each chart
-    rate_list = get_rate_data(year, state, bias_category)
+    rate_list = get_rate_data(year, bias_category)
 
     # Create dictionary for return
     dataToReturn = {'rate': rate_list}   
@@ -171,8 +172,8 @@ def get_query_results(table, columns, filters, groups_orders):
 
     return results
 
-# Get data for incident chart and convert to a list of dictionaries
-def get_inc_data(year, state, bias_category):
+# Get summary data for bias chart and convert to a list of dictionaries
+def get_inc_data(state):
 
     start_time = time.time()
     
@@ -250,8 +251,8 @@ def get_offense_data(year, state, bias_category):
 
     return data_list
 
-# Get data for bias chart and convert to a list of dictionaries
-def get_bias_data(year, state, bias_category):
+# Get data for bias charts and convert to a list of dictionaries
+def get_bias_data(state):
     
     start_time = time.time()
 
@@ -286,7 +287,7 @@ def get_bias_data(year, state, bias_category):
     return data_list
 
 # Get list of dictionaries for incident rate chart
-def get_rate_data(year, state, bias_category):
+def get_rate_data(year, bias_category):
 
     start_time = time.time()
     
