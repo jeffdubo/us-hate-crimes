@@ -13,14 +13,12 @@ An interactive web application to investigate hate crime in America between 2009
 * [Installation and Setup](#installation-and-setup)
     * [Software Requirements](#software-requirements)
     * [General Instructions](#general-instructions)
-    * [PostgreSQL Database Instructions](#postgresql-database-instructions)
+    * [Database Setup](#postgresql-database-instructions)
 * [Data](#data)
     * [Sources](#sources)
     * [Aquisition](#acquisition)
     * [Processing](#processing)
 * [Database Structure](#database-structure)
-    * [ERD](#erd)
-    * [Schema](#schema)
 * [Web Application](#web-application)
 * [Repository Structure](#repository-structure)
 * [Results and Evaluation](#results-and-evaluation)
@@ -58,19 +56,21 @@ The following software requirements and instructions were developed and have onl
 Note: PostgreSQL software is not needed if using the SQLite database.
 
 ### General Instructions
-1. Verify the above software requirements and dependencies have been meet on your computer.
+1. Verify the above software requirements and dependencies have been met on your computer.
 2. Clone this repository.
-3. If creating a postgreSQL database, edit the [config_blank.py](config_blank.py) file and update the variables with your postgreSQL database information.
+3. If using a PostgreSQL database, edit the [config_blank.py](config_blank.py) file and update the variables with your postgreSQL database information.
     ```
     db_username = '[username]' # Default in pgAdmin is postgres
     db_password = '[your password]'
     b_host = 'localhost'
     db_port = 5432
     db_name = '[name of your database]'
+    db_options = ''
     ```
+    Note: Modify db_options only if you are using a hosted service that requires additional parameters when connecting to the database. 
 4. If using the existing SQLite database, edit the [config_blank.py](config_blank.py) file and set the flag to false.
     ```
-    postgreSQL_flag = False.
+    postgreSQL_flag = False
     ```
 5. After updating and saving config_blank.py, rename it to config.py.
 
@@ -80,29 +80,46 @@ Note: PostgreSQL software is not needed if using the SQLite database.
     ```
     You can get an API key at  https://api.census.gov/data/key_signup.html.
 7. After updating and saving config_blank.py, rename it to config.py.
-8. Open a terminal and start the application.
-    ```
-    python app.py
-    ```
-    If you are using a postgreSQL database and get a connection refused error message or a failure to connect to the server message, make sure postgreSQL is installed properly and the windows service is running.
-9. Open your Internet browser and go to http://127.0.0.1:5000.
-10. To stop the application, press CTRL+C in your terminal and close the browser tab.
 
-# Need to redo section below!!!
-### PostgreSQL Database Instructions
-These instructions assume you have installed and are familiar with postgreSQL and pgAdmin.
-1. Open pgAdmin and create a database.
-2. Use the Query Tool to open the file [hate_crime_schema.sql](database/schema-erd/hate_crime_schema.sql). 
-3. Highlight and run the code for each table and view. 
-4. Right click on each table on the panel and import the corresponding csv file stored in the [database/transformed_data directory](database/transformed_data). Important: Import the files in the order that the tables were created to avoid errors due to foreign key constraints.
+### Database Setup
+Follow the instructions below to setup a PostgreSQL database using SQLalchemy. Note that a SQLite database (database/us_hate_crimes_sqlite.db) is included in this repository and does not require any setup or additional software to use.   
+1. Verify that PostgreSQL is installed and the windows service is running. 
+2. Open a terminal window in the database directory and start Jupyter Notebook.
+    ```
+    jupyter notebook
+    ```
+3. From Jupyter notebook, open the file [db_creation_postgresql.ipynb](database/db_creation_postgresql.ipynb).
+4. Run each cell in order to create the database and load data into all of the tables. Note there is section if you need to delete all data in the database or want to verify that the data was loaded.  
 
 ### Application Usage
-1. Follow installation instructions above.
-2. Naviate to the project directory and execute the following command.
+1. Follow the installation instructions above.
+2. Open a terminal in the root directory of the repository and start the application.
     ```
     python app.py
     ```
-3. Once the application has connected to the database and is running, go the the URL listed for the development server. This is typically http://127.0.0.1:5000/.
+    If you are using a PostgreSQL database and get a connection refused error message or a failure to connect to the server message, make sure PostgreSQL is installed properly and the windows service is running.
+3. Open your Internet browser and go to http://127.0.0.1:5000.
+
+    ![dashboard.png](images/dashboard.png)
+
+4. Hover over a state with your mouse to view the number of incidents and incident rate for that state.
+
+    ![map_hover_ca.png](images/map_hover_ca.png)
+
+5. Click on state to update the panel information to the left of the map and all charts to reflect that state.
+
+    ![map_select_ca.png](images/map_select_ca.png)
+
+6. Use the dropdown menus on the right to filter the data for the panel information and charts.
+
+     ![dashboard_filters.png](images/dashboard_filters.png)
+
+    Note the following charts will not be changed depending on the filter selected:
+    * Hate Crimes by Bias Category Over Time - Not changed by the Year and Bias Category dropdown.
+    * Hate Crimes by Bias Category - Not changed by the Bias Category dropdown.
+    * Top 10 States by Incident Rate - Not changed by the State dropdown.
+
+7. To stop the application, press CTRL+C in your terminal and close the browser tab.
 
 ## Data
 
@@ -145,19 +162,24 @@ The US Census Bureau data was processed using Python in a [Jupyter notebook](dat
 
 ## Database Structure
 
-### ERD
-
-The following Entity Relationship Diagram (ERD) was created using pgAdmin.
+The following Entity Relationship Diagram (ERD) visualizes the entities, attributes and relationships in the database.
 
 ![db_ERD.png](database/schema_erd/db_erd.png)
 
-Something about normalization
-
-### Schema
+A few notes regarding the overall structure:
+* For simplicity and ease of querying the database, some tables were not fully normalized (3NF), specifically the bias, offense, and state tables.
+* Three views were created (see [db_schema_views.sql](database/schema_erd/db_schema_views.sql)) to simplify the SQLalchemy queries in the flask app and improve performance.
 
 ## API Documentation
 
+The API uses the following endpoints:
 
+* ```/api/lists``` - Retrieves option lists for the Year, State, and Bias Category dropdowns.
+* ```/api/biasdata/<state>``` - Retrieves incident information for a specific state.
+* ```/api/ratedata/<year>/<bias_category>``` - Retrieves incident rate information for a specific year and bias category.
+* ```/api/offensedata/<year>/<state>/<bias_category>``` - Retrieves offense information for a specific year, state and bias category. 
+
+Note: Use 'All' for any of the paramters to get information for all options for that parameter. Example: ```/api/offensedata/2019/California/All```   
 
 ## Repository Structure
 
@@ -173,9 +195,12 @@ This repository is organized into the following folders:
 * [testing](testing) - sql and python code used during testing and development 
 * root directory - application code, configuration files, licenses and this readme.
 
-## Results and Evaluation
+## Analysis and Project Evaluation
 
+### Analysis
 
+The dashboard allows the user to view hate crime information by year, state, and bias category. A preliminary analysis reveals the following:
+* 
 
 ### Evaluation
 
