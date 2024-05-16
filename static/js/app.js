@@ -1,6 +1,7 @@
 // Local URL
 // Note: If hosted, replace this with website URL
 var url = 'http://127.0.0.1:5000'
+// var url = 'https://app.koyeb.com/apps/333dd52b-5855-4163-981b-dcc8581a22c1/services/4d66a877-f871-44df-b861-4ee6d62bead1'
 
 // Set variables for html elements for dropdown filters 
 var selectYear = d3.select("#selYear");  
@@ -33,10 +34,9 @@ function createSelectOptions(select, values) {
 }
 
 // Get lists for dropdown filters from database
-d3.json(url + '/lists')
+d3.json(url + '/api/lists')
 	.then(function (data) {
-    	console.log('Lists', data);
-    	
+    	   	
 		// Populate the select options for state and year dropdowns
 		createSelectOptions(selectYear, data.years);
 		createSelectOptions(selectState, data.states);
@@ -60,8 +60,8 @@ function refreshData() {
 	if (selectedState === '') { selectedState = 'All'; };
 	if (selectedBias === '') { selectedBias = 'All'; };
 
-	// Get bias data and create/refresh charts
-	d3.json(url + '/biasdata/' + selectedYear + '/' + selectedState + '/' + selectedBias)
+	// Get bias data and create/update charts
+	d3.json(url + '/api/biasdata/'+ selectedState)
 		.then(function (data) {
 			
 			// Create and update charts
@@ -73,7 +73,7 @@ function refreshData() {
 		});	
 
 	// Get offense data and create/update chart
-	d3.json(url + '/offensedata/' + selectedYear + '/' + selectedState + '/' + selectedBias)
+	d3.json(url + '/api/offensedata/' + selectedYear + '/' + selectedState + '/' + selectedBias)
 		.then(function (data) {
 			
 			createOffenseChart(data.offense);
@@ -82,8 +82,8 @@ function refreshData() {
     		console.error("Error loading JSON data:", error);
 		});	
 
-	// Get race data and create/update charts, panel information and map
-	d3.json(url + '/ratedata/' + selectedYear + '/' + selectedState + '/' + selectedBias)
+	// Get incident rate data and create/update charts, panel information and map
+	d3.json(url + '/api/ratedata/' + selectedYear + '/' + selectedBias)
 		.then(function (data) {
   			
 			// Update panel information
