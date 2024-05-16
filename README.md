@@ -58,31 +58,33 @@ Note: PostgreSQL software is not needed if using the SQLite database.
 ### General Instructions
 1. Verify the above software requirements and dependencies have been met on your computer.
 2. Clone this repository.
-3. If using a PostgreSQL database, edit the [config_blank.py](config_blank.py) file and update the variables with your postgreSQL database information.
-    ```
-    db_username = '[username]' # Default in pgAdmin is postgres
-    db_password = '[your password]'
-    b_host = 'localhost'
-    db_port = 5432
-    db_name = '[name of your database]'
-    db_options = ''
-    ```
-    Note: Modify db_options only if you are using a hosted service that requires additional parameters when connecting to the database. 
-4. If using the existing SQLite database, edit the [config_blank.py](config_blank.py) file and set the flag to false.
-    ```
-    postgreSQL_flag = False
-    ```
-5. After updating and saving config_blank.py, rename it to config.py.
+3. Edit the [config_blank.py](app/config_blank.py) file in the app folder.
+    * If using a PostgreSQL database, update the following variables with your postgreSQL database information.
 
-6. If you will be extracting census information using the [data_processing_hate_crime.ipynb](database/data_processing_hate_crime.ipynb) notebook, edit the [census_config_blank.py](database/census_config_blank.py) file in the database directory and update the variable with your API key. 
-    ```
-    census_key = '[your API key]'
-    ```
-    You can get an API key at  https://api.census.gov/data/key_signup.html.
-7. After updating and saving config_blank.py, rename it to config.py.
+        ```
+        db_username = 'postgres' # Change this if you've created a different user
+        db_password = '[your password]'
+        db_host = 'localhost' # Change this if you're accessing a hosted database
+        db_port = 5432
+        db_name = '[name of your database]'
+        db_options = '' # Use this variable to store any options needed to connect to a hosted database
+        ```
+ 
+    * If using the existing SQLite database, set the flag to false.
+        ```
+        postgreSQL_flag = False
+        ```
+
+    * If you will be extracting census information using the [data_processing_us_census.ipynb](data/data_processing_us_census.ipynb) notebook, update the variable with your API key. 
+        ```
+        census_key = '[your API key]'
+        ```
+        You can get an API key at  https://api.census.gov/data/key_signup.html.
+
+4. After updating, saving and closing the config_blank.py, rename it to config.py.
 
 ### Database Setup
-Follow the instructions below to setup a PostgreSQL database using SQLalchemy. Note that a SQLite database (database/us_hate_crimes_sqlite.db) is included in this repository and does not require any setup or additional software to use.   
+The instructions below use SQLalchemy to setup a PostgreSQL database. The SQLite database (database/us_hate_crimes_sqlite.db) is included in this repository and does not require any setup or additional software to use. If you would like to recreate the SQLite database, use the file [db_creation_sqlite.ipynb](database/db_creation_sqlite.ipynb). 
 1. Verify that PostgreSQL is installed and the windows service is running. 
 2. Open a terminal window in the database directory and start Jupyter Notebook.
     ```
@@ -93,24 +95,28 @@ Follow the instructions below to setup a PostgreSQL database using SQLalchemy. N
 
 ### Application Usage
 1. Follow the installation instructions above.
-2. Open a terminal in the root directory of the repository and start the application.
+2. Open a terminal in the root directory and change to the app directory.
+    ```
+    cd app
+    ```
+3. Start the application.
     ```
     python app.py
     ```
     If you are using a PostgreSQL database and get a connection refused error message or a failure to connect to the server message, make sure PostgreSQL is installed properly and the windows service is running.
-3. Open your Internet browser and go to http://127.0.0.1:5000.
+4. Open your Internet browser and go to http://127.0.0.1:5000.
 
     ![dashboard.png](images/dashboard.png)
 
-4. Hover over a state with your mouse to view the number of incidents and incident rate for that state.
+5. Hover over a state with your mouse to view the number of incidents and incident rate for that state.
 
     ![map_hover_ca.png](images/map_hover_ca.png)
 
-5. Click on state to update the panel information to the left of the map and all charts to reflect that state.
+6. Click on state to update the panel information to the left of the map and all charts to reflect that state.
 
     ![map_select_ca.png](images/map_select_ca.png)
 
-6. Use the dropdown menus on the right to filter the data for the panel information and charts.
+7. Use the dropdown menus on the right to filter the data for the panel information and charts.
 
      ![dashboard_filters.png](images/dashboard_filters.png)
 
@@ -119,7 +125,7 @@ Follow the instructions below to setup a PostgreSQL database using SQLalchemy. N
     * Hate Crimes by Bias Category - Not changed by the Bias Category dropdown.
     * Top 10 States by Incident Rate - Not changed by the State dropdown.
 
-7. To stop the application, press CTRL+C in your terminal and close the browser tab.
+8. To stop the application, press CTRL+C in your terminal and close the browser tab.
 
 ## Data
 
@@ -136,7 +142,7 @@ Follow the instructions below to setup a PostgreSQL database using SQLalchemy. N
 
 ### Processing
 
-The data was extracted from from the sources above and transformed to load into a database. The FBI data was processed using Python in a [Jupyter notebook](database/data_processing_us_census.ipynb) as follows:
+The data was extracted from from the sources above and transformed to load into a database. The FBI data was processed using Python in a [Jupyter notebook](data/data_processing_us_census.ipynb) as follows:
 1. Hate crime data was extracted from a csv or xlsx file and columns reviewed.
 
     ![fbi_data_extract.png](images/fbi_data_extract.png)
@@ -150,7 +156,7 @@ The data was extracted from from the sources above and transformed to load into 
 
     ![fbi_data_normalize.png](images/fbi_data_normalize.png)
 
-The US Census Bureau data was processed using Python in a [Jupyter notebook](database/data_processing_hate_crime.ipynb) as follows:
+The US Census Bureau data was processed using Python in a [Jupyter notebook](data/data_processing_hate_crime.ipynb) as follows:
 1. Population data for each year was extracted and reviewed.
 
     ![census_data_extract.png](images/census_data_extract.png)
@@ -184,16 +190,18 @@ Note: Use 'All' for any of the paramters to get information for all options for 
 ## Repository Structure
 
 This repository is organized into the following folders:
-* [database](database) - python code for data processing and sqlite database creation as well as the resulting sqlite database
-* [database/schema-erd](database/schema-erd) - sql code to create PostgreSQL database and ERD diagram
-* [database/source_data](database/source_data) - FBI source data
-* [database/transformed_data](database/transformed_data) - csv files for database tables
+* [app](app) - python code for web application
+    * [app/static](app/static) - folders for css, javascript, and images for dashboard
+    * [app/templates](app/templates) - dashboard home page
+* [data](data) - python code for processing hate crime and census data
+    * [data/source_data](data/source_data) - spreadsheet with FBI data
+    * [data/transformed_data](data/transformed_data) - csv files for database tables
+* [database](database) - SQLite database and python code for creating PostgreSQL and SQLite databases from processed data in csv files
+    * [database/schema_erd](database/schema_erd) - sql code to create PostgreSQL database and ERD diagram
 * [images](images) - image files for this README
 * [resources](resources) - documentation and technical specification for hate crime reporting and data collection
-* [static](static) - folders for css, javascript, and images for dashboard
-* [templates](templates) - dashboard home page
-* [testing](testing) - sql and python code used during testing and development 
-* root directory - application code, configuration files, licenses and this readme.
+* [testing](testing) - sql and python code used during testing and development
+* [root](/) - license, python requirements and this readme.
 
 ## Analysis and Project Evaluation
 
