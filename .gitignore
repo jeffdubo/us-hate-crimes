@@ -1,6 +1,7 @@
 # Project exclusions
 config.py
 fbi_hate_crime_data.csv
+_outside_repo
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
