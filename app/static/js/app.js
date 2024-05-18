@@ -1,7 +1,6 @@
 // Local URL
 // Note: If hosted, replace this with website URL
 var url = 'http://127.0.0.1:5000'
-// var url = 'https://app.koyeb.com/apps/333dd52b-5855-4163-981b-dcc8581a22c1/services/4d66a877-f871-44df-b861-4ee6d62bead1'
 
 // Set variables for html elements for dropdown filters 
 var selectYear = d3.select("#selYear");  

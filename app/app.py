@@ -11,14 +11,14 @@ import time
 
 # Get database information from config file
 # Note: config.py must be created locally and is not stored in Github
-from config import postgreSQL_flag, db_username, db_password, db_host, db_port, db_name
+from config import postgresql_flag, db_username, db_password, db_host, db_port, db_name, db_options
 
 app = Flask(__name__)
 
 # Create a SQLAlchemy database engine
 
-if postgreSQL_flag:
-    db_url = f'postgresql://{db_username}:{db_password}@{db_host}:{db_port}/{db_name}'
+if postgresql_flag:
+    db_url = f'postgresql://{db_username}:{db_password}@{db_host}:{db_port}/{db_name}{db_options}'
 else:
     db_url = 'sqlite:///database/us_hate_crimes_sqlite.db'
 
@@ -88,7 +88,21 @@ print('Connected to database')
 def index():
     return render_template('index.html')
 
-# Get lists for select dropdowns to filter charts
+# Route to get list of routes
+@app.route('/api/routes')
+def get_routes():
+    # Define a list of available routes in the API
+    routes = [
+        '/api/lists',
+        '/api/biasdata/<state>',
+        '/api/ratedata/<year>/<bias_category>',
+        '/api/offensedata/<year>/<state>/<bias_category>'
+    ]
+
+    # Return the list of routes as a JSON response
+    return jsonify({"Available routes": routes})
+
+# Route to get lists for select dropdowns to filter charts
 @app.route('/api/lists')
 def get_lists():
     try:
@@ -119,7 +133,7 @@ def get_lists():
         print("Error accessing the table:", str(e))
         return jsonify({"error": "Table access failed"}), 500
 
-# Get data for bias charts
+# ROute to get data for bias charts
 @app.route('/api/biasdata/<state>')
 def get_data(state):
     
@@ -132,7 +146,7 @@ def get_data(state):
 
     return jsonify(dataToReturn)
 
-# Get data for offense chart
+# ROute to get data for offense chart
 @app.route('/api/offensedata/<year>/<state>/<bias_category>')
 def get_offense_data(year, state, bias_category):
     
@@ -145,7 +159,7 @@ def get_offense_data(year, state, bias_category):
     return jsonify(dataToReturn)
 
 
-# Get data for incident rate chart
+# Route to get data for incident rate chart
 @app.route('/api/ratedata/<year>/<bias_category>')
 def get_rate_data(year, bias_category):
     
@@ -157,7 +171,7 @@ def get_rate_data(year, bias_category):
 
     return jsonify(dataToReturn)
 
-# Define route functions
+# Define functions for routes
 
 # Get query results for chart functions
 def get_query_results(table, columns, filters, groups_orders):
@@ -172,7 +186,7 @@ def get_query_results(table, columns, filters, groups_orders):
 
     return results
 
-# Get summary data for bias chart and convert to a list of dictionaries
+# Get summary data for bias chart
 def get_inc_data(state):
 
     start_time = time.time()
@@ -207,7 +221,7 @@ def get_inc_data(state):
 
     return data_list
 
-# Get data for offense chart and convert to a list of dictionaries
+# Get data for offense chart
 def get_offense_data(year, state, bias_category):
 
     start_time = time.time()
@@ -251,7 +265,7 @@ def get_offense_data(year, state, bias_category):
 
     return data_list
 
-# Get data for bias charts and convert to a list of dictionaries
+# Get data for bias charts
 def get_bias_data(state):
     
     start_time = time.time()
