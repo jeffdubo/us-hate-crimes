@@ -1,5 +1,4 @@
 # Execute pip install -r requirements.txt to install all modules
-python==3.11.2
 pandas==2.1.4
 SQLAlchemy==2.0.25
 psycopg2==2.9.9
