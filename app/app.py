@@ -20,7 +20,7 @@ app = Flask(__name__)
 if postgresql_flag:
     db_url = f'postgresql://{db_username}:{db_password}@{db_host}:{db_port}/{db_name}{db_options}'
 else:
-    db_url = 'sqlite:///database/us_hate_crimes_sqlite.db'
+    db_url = 'sqlite:///../database/us_hate_crimes_sqlite.db'
 
 engine = create_engine(db_url)
 
