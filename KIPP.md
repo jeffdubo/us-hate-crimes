@@ -1,0 +1,9 @@
+# Sample Python Code
+
+Please review the code in the following files:
+* [data_processing_hate_crime.ipynb](data/data_processing_hate_crime.ipynb) and [data_processing_us_census.ipynb](data/data_processing_us_census.ipynb) - Demonstrates the ability to clean and manipulate the shape of data for a business purpose. In these files, FBI Hate Crime data and US Census data is cleaned, transformed and exported to csv files to create a normallized database. Note the database was created using the Python SQLalchemy module. These files are located in the [data directory](data).
+* [app.py](app/app.py) - Demonstrates ability to move data between two systems. In this file, the Python Flask module is used to connect to either a PostgreSQL or SQLite database, query the database and return data via an API call. There are 4 endpoints, three of which include parameters. Note these calls are made through Javascript. The Javascript files are located in the [app/static/js directory](app/static/js).
+
+You can find further information on the overall project in the [README.md](README.md) file.
+
+*IMPORTANT* The purpose of this project was to redesign and improve an interactive web application developed for a group assignment in UC Berkeley's Data Analytics Boot Camp. I've commented any code that was based on code from one of the members of the group. Due to significant changes I made in the data processiing, database, flask application, and dashboard, almost all of the code was completely rewritten. You can view the original project [here](https://github.com/evacs/Project-3) if needed. The README.md also highlights changes and improvements.
