@@ -1,17 +1,12 @@
-# Requirements File
-# Add all Python modules/libraries needed for website
-
-# Basic dependencies
-pandas
-numpy
-requests
-pathlib
-
-# SQL
-SQLAlchemy==2.0.2
-psycopg2
-Flask
-# jsonify
-# warnings
+# Execute pip install -r requirements.txt to install all modules
+python==3.11.2
+pandas==2.1.4
+SQLAlchemy==2.0.25
+psycopg2==2.9.9
+Flask==2.2.5
+requests==2.31.0
+pathlib==1.0.1
+jsonify==0.5
+werkzeug==2.2.3
 
 
