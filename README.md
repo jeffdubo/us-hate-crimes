@@ -13,8 +13,7 @@ An interactive web application to investigate hate crime in America between 2009
 * [Installation and Setup](#installation-and-setup)
     * [Software Requirements](#software-requirements)
     * [General Instructions](#general-instructions)
-    * [Database Setup](#database-setup)
-    * [Application Usage](#application-usage)
+    * [Database Setup](#postgresql-database-instructions)
 * [Data](#data)
     * [Sources](#sources)
     * [Aquisition](#acquisition)
@@ -22,7 +21,7 @@ An interactive web application to investigate hate crime in America between 2009
 * [Database Structure](#database-structure)
 * [Web Application](#web-application)
 * [Repository Structure](#repository-structure)
-* [Project Evaluation](#project-evaluation)
+* [Results and Evaluation](#results-and-evaluation)
 * [Future Work](#future-work)
 * [Acknowledgements/References](#acknowledgements/references)
 * [License](#license)
@@ -44,8 +43,6 @@ The purpose of this project was to redesign and improve an interactive web appli
 4. Project must be powered by a dataset with at least 100 records.
 5. Project must include some level of user-driven interaction, such as menus, dropdowns, and textboxes.
 6. Final visualization should include at least 3 views.
-
-[Back to Table of Contents](#table-of-contents)
 
 ## Installation and Setup
 
@@ -130,13 +127,11 @@ The instructions below use SQLalchemy to setup a PostgreSQL database. The SQLite
 
 8. To stop the application, press CTRL+C in your terminal and close the browser tab.
 
-[Back to Table of Contents](#table-of-contents)
-
 ## Data
 
 ### Sources
 * FBI Hate Crime Data: https://cde.ucr.cjis.gov/LATEST/webapp/#/pages/downloads#datasets
-* FBI NIBRS Group A Offenses: https://le.fbi.gov/file-repository/nibrs-technical-specification-063023.pdf/view ()
+* FBI NIBRS Group A Offenses: https://le.fbi.gov/file-repository/nibrs-technical-specification-063023.pdf/view
 * US Census Bureau Bike Commuting Data (2022 ACS5 Table S0802): https://data.census.gov/table/ACSST5Y2022.S0802?q=commuting
 
 ### Acquisition
@@ -192,8 +187,6 @@ The API uses the following endpoints:
 
 Note: Use 'All' for any of the paramters to get information for all options for that parameter. Example: ```/api/offensedata/2019/California/All```   
 
-[Back to Table of Contents](#table-of-contents)
-
 ## Repository Structure
 
 This repository is organized into the following folders:
@@ -210,62 +203,28 @@ This repository is organized into the following folders:
 * [testing](testing) - sql and python code used during testing and development
 * [root](/) - license, python requirements and this readme.
 
-[Back to Table of Contents](#table-of-contents)
+## Analysis and Project Evaluation
 
-## Project Evaluation
+### Analysis
 
-Overall, this project was a personal success as it greatly expanded my knowledge, troubleshooting skills, and experience in coding, database development, and web visualizations. The resulting product improved upon the original group project in the following areas:
+The dashboard allows the user to view hate crime information by year, state, and bias category. A preliminary analysis reveals the following:
+* 
 
-* Data Processing
-    * Multiple notebooks for processing hate crimes data were combined to centralize code and simplify steps for processing.
-    * Hate crimes code was rewritten for clarity, consistency and to reflect changes in the database structure. Code was also added for further cleaning and validation.
-    * US Census code was modified to exclude population totals for all races and add population totals for other races.
-    * Markdown was added in large notebooks to easily navigate sections, note code contributions, and further comment code.
-* Database Structure
-    * The following tables were removed: agencies, agency_oris, agency_units, population_groups, and ethnicity. The agencies in the hate crime data represented a mix of reporting agencies (local police, FBI, universities) as well as cities and municipalities. Given the wide range and limitations of this data, the related tables were not used in the original project. Similarly the population_group was based on the agency_type. The ethnicity table was omitted as the race table could be easily mapped to the census data.
-    * Additional fields (offense category, code, and type of crime against society) were added to the offense table. The source data was found as part of this project.
-    * Three views were added in the database to simplify SQLalchemy queries in the application and improve performance.
-* Database Creation
-    * Python code was added to create and load a PostgreSQL database using SQLalchemy and SQL code files. The original project required pgAdmin to execute SQL commands from a file and then import the csv files manually.
-    * Python code was added to create and use a SQLite database in addition to a PostgreSQL database.
-* Application Dashboard
-    * An interactive US map was added to visualize the hate crime incident rates and select a state to filter data in other visuals by that state.
-    * A informational visual with total incidents, population and incident rate was added.
-    * Centralized dropdown menus for year, state and bias category were added to easily filter all visuals.
-    * Hate crimes over time chart and hate crimes by bias category charts were combined into one chart.
-    * A pie chart of hate crimes by bias category was added.
-    * Layout and formatting of charts was redesigned for consistency, ease of use, and a cleaner overall appearance.
-* Application Code
-    * Python code was modified to enable using either the PostgreSQL or SQLite database.
-    * All flask routes were rewritten to pass values from the dashboard filters as parameters and utlize shared code for consistency and efficiency.
-    * Javascript code was added for interactive map, informational visual, and pie chart.
-    * Javascript code was rewritten to utlize centralized filters, changes in visuals, and new flask routes. Additional functions were added to streamline and simplify code.
-    * CCS sheet was created for the new layout and formatting.
-    * HTML was modified for the new visuals, layout and formatting.
-* Repository Structure
-    * Application code was centralized in one folder.
-    * Data processing and database creation files and code were split into separate folders.
-    * This markdown file was created to fully document the project.
+### Evaluation
 
-There were also the following challenges and limitations in the project:
-* FBI Hate Crime Dataset - Several fields in the dataset (offense, bias, location, victim type) contained multiple values in one record. These were distiguished as separate records during extraction and required significant transformation to normalize the database. The dataset also did not include information regarding the city and state where the hate crime was committed. It did include information regarding the reporting agency which included the state and in some cases the city as the name or unit of the agency. The dashboards were based on this state field and it's very possible that some of the incidents occurred in a different state from the reporting agency. This was not noted in any documentation on the FBI website.
-* Normalized Database - A normalized database is faster and smaller but does result in many tables and relationships which then require more complex queries to obtain data for the visuals. This was compounded by multiple dropdowns to filter data. As a result, the number of visuals was limited and some data (e.g. location, victime type, viction counts, offender race, offender counts, population by race, jurisdiction) was not utilized in a visual.
-* SQLite Database - The python code used Pandas to export dataframes to the database. This functionality cannot create primary and foreign keys and by default will automatically define the datatype for each field/attribute. This was chosen for expediency as the application was initially designed to use a PostgreSQL database.
-* Additional Tools and Knowledge - It cannot be ignored that I still have much to learn and there are many tools I have not yet used that could have improved the functionality and functioning of the application. I explored some new tools but need further study and practice to leverage them in future projects.
+Limitations
+There were several challenges in this project:
+1. FBI Hate Crime Dataset - Several fields in the dataset (offense, bias, location, victim type) contained multiple values in one record. These were distiguished as separate records during extraction and transformation but resulted in a complex schema and normalized PostgreSQL database. The dataset also did not include information regarding the city or state where the hate crime was committed. It did include information regarding the reporting agency which included the state and in some cases the city as the name or unit of the agency. The dashboards were based on this state field and it's very possible that some of the incidents occurred in a different state from the reporting agency. This was not noted in any documentation on the FBI site.
 
-[Back to Table of Contents](#table-of-contents)
+3. PostgreSQL Database - As stated above, the normalized PostgreSQL database was complex and contained many tables and relationships. The process of extracting and transforming the data into csv files to create the database was time-consuming and delayed the creation of the flask apps and dashboards. As a result, some of the flask apps were based on a table that mirrored the initial hate critme dataset with multiple values in one record. In hindsight, it may have been more effective to use MongoDB or simplify the database schema.
+4. Database and Website Hosting - The advantage of using a hosting service (Render) was the ability for everyone to use the same database and test the code and html using the same service, rather than doing this locally. The challenge in this was learning how to publish the database and website for Render and then discovering the limitations of their free plan, specifically the reliability of remote connections when the hosted server spun down due to inactivity. Although a final published site is up and running, local testing was most effective.
+5. Github - The group is still learning Github and the best way to effectively manage and merge code. Juypter notebooks for data cleaning were not integrated and some code in the app.py and app.js needed to be manually updated in the main branch due to merging issues.
+6. Project Management - As with Github, the group is still learning how best to divide up work and adequately estimate the time needed for that work. This created delays and impacted the final product. The dashboard was created the last two days of the project and did not include several planned interactive charts and information. 
 
 ## Future Work
 
-Some recommended areas of future work on this application include:
-* Additional Pages/Visuals - Create a navigation pane/menu and add addtional pages with visuals based on currently unused data (e.g. location, victim type, viction counts, offender race, offender counts, population by race, jurisdiction). Also create a summary page with summary data and trends (% increase in incidents from 2009 to 2021).
-* Interactive Map - Use a static map (such as D3) instead of Leaflet which cannot easily illustrate Alaska and Hawaii below and to the left of the US. Currently, it is easiest to use the dropdown filter to select those states.
-* Filters - Add a filter by region and/or division. This would provide valuable information regarding incident numbers and rates in specific areas of the US such as the west coast, the northwest or the south.
-* Racial Bias and Population - Create visuals/filters to explore and compare hate crimes based on race, ethnicity and ancenstry with the population's racial composition.
-* Offense Category and Bias Category - Create visuals/filters to explore the relationship between these categories.
-* Exporting Data - Add functionality to export summary and incident level data in multiple formats from visuals for further analysis.
-
-[Back to Table of Contents](#table-of-contents)
+* Ability to filter by region and 
+* Map use static map via D3 and place Alaska and Hawaii to below and to the left of the US.
 
 ## Acknowledgments/References
 
@@ -274,8 +233,6 @@ This project was based on a group assignment I completed as part of [UC Berkeley
 I'd also like to acknowledge the following resources:
 *  FBI Uniform Crime Reporting (UCR) Program - This program aggregates all hate crime offenses reported by law enforcement agencies and maintains data collection guidelines, training materials and annual updates to their methodology. This information was critical to understanding and evaluating the hate crime data.
 *  FBI National Incident-Based Reporting System (NIBRS) - This system was created to improve the overall quality of crime data collected by law enforcement. They maintain and update technical specifications for reporting that included categorical information and codes for all group A offenses.  
-
-[Back to Table of Contents](#table-of-contents)
 
 ## License
 
