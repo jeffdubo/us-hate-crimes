@@ -1,0 +1,6 @@
+# Requirements File
+sqlalchemy==2.0.25
+pandas==2.2.1
+psycopg2==2.9.3
+Flask==2.2.5
+gunicorn==22.0.0
